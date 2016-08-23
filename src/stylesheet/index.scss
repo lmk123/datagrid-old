@@ -1,0 +1,41 @@
+@charset "utf-8";
+.datagrid {
+  .hidden {
+    display: none;
+  }
+
+  th, td {
+    text-align: center;
+  }
+
+  .grid-body {
+    min-width: 100%;
+  }
+
+  .tables-wrapper {
+    position: relative;
+
+    .grid-columns {
+      position: relative;
+    }
+
+    .grid-fixed-body-wrapper,
+    .grid-fixed-columns-wrapper {
+      width: 100%;
+      position: absolute;
+      left: 0;
+    }
+
+    .grid-fixed-columns-wrapper {
+      top: 0;
+    }
+
+    .grid-columns-wrapper {
+      overflow: hidden;
+    }
+
+    .grid-body-wrapper {
+      overflow: scroll;
+    }
+  }
+}
