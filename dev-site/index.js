@@ -393,16 +393,7 @@ grid.setData({
       "投诉及撤销(蜂鸟)": "1",
       "其他咨询(蜂鸟)": "1,557"
     }
-  ]
+  ],
+  size: 30,
+  total: 109
 })
-
-setTimeout(function () {
-  // 测试无数据
-  grid.setData({
-    columns: [{ "name": "日期", "type": "常规", "fixed": false }],
-    data: [{
-      '日期': 20
-    }]
-  })
-}, 2000)
-

@@ -1,13 +1,15 @@
 import noop from './utils/noop'
 import containerTemplate from './templates/container.html'
-
-// TODO 宽度要对齐
+import pagerTemplate from './templates/pager.html'
 
 class DataGrid {
   constructor (ele) {
     this._container = ele
     ele.classList.add('datagrid')
     this._height = ele.clientHeight
+    this._pager = {
+      curPage: 1
+    }
   }
 
   _init () {
@@ -23,7 +25,8 @@ class DataGrid {
       $body: '.grid-body',
       $bodyWrapper: '.grid-body-wrapper',
       $fixedBody: '.grid-fixed-body',
-      $fixedBodyWrapper: '.grid-fixed-body-wrapper'
+      $fixedBodyWrapper: '.grid-fixed-body-wrapper',
+      $pagerWrapper: '.grid-pager-wrapper'
     }
 
     for (let key in ui) {
@@ -55,6 +58,7 @@ class DataGrid {
     this.fixedColumns = []
     this._renderHeaders(data.columns)
     this._renderBody(data.data)
+    this._renderPager(data.size, data.total)
     this.resize()
   }
 
@@ -135,10 +139,30 @@ class DataGrid {
   }
 
   /**
+   * 渲染分页
+   * @param {Number} size - 每次请求的数据有多少条
+   * @param {Number} total - 总共有多少条数据
+   * @private
+   */
+  _renderPager (size, total) {
+    const { _pager } = this
+    const { curPage } = _pager
+    const dataLength = this.data.length
+
+    _pager.start = (curPage - 1) * size + 1
+    _pager.end = _pager.start + dataLength - 1
+    _pager.total = total
+    _pager.totalPage = Math.ceil(total / size)
+    this._ui.$pagerWrapper.innerHTML = pagerTemplate.replace(/\{\{(\w+)\}\}/g, (word, group) => {
+      return _pager[group]
+    })
+  }
+
+  /**
    * 调整高度、字段的宽度等。
    */
   resize () {
-    const { $columns, $fixedColumns, $bodyWrapper, $body, $fixedBodyWrapper } = this._ui
+    const { $columns, $fixedColumns, $bodyWrapper, $body, $fixedBodyWrapper, $pagerWrapper } = this._ui
 
     // 先给 body 设置计算出来的宽度
     // $columns.style.width = $body.style.width = this._tableWidth + 'px'
@@ -152,8 +176,9 @@ class DataGrid {
 
     // 再根据 headers 的高度调整 body 的高度及 top 值
     const columnsHeight = $columns.clientHeight
+    const pagerHeight = $pagerWrapper.clientHeight
     const totalHeight = this._height
-    const bodyHeight = totalHeight - columnsHeight
+    const bodyHeight = totalHeight - columnsHeight - pagerHeight
 
     $fixedBodyWrapper.style.top = $fixedColumns.style.height = columnsHeight + 'px'
     $fixedBodyWrapper.style.height = $bodyWrapper.style.height = bodyHeight + 'px'
