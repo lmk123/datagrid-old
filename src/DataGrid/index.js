@@ -84,6 +84,8 @@ class DataGrid extends Event {
    */
   _renderColumns () {
     let columnsHTML = ''
+    let colGroupHTML = ''
+    let totalWidth = 0
     this.columnsDef.map(columnDef => {
       const _def = typeof columnDef === 'string'
         ? { name: columnDef }
@@ -91,11 +93,19 @@ class DataGrid extends Event {
 
       if (!columnDef.key) columnDef.key = columnDef.name
 
+      const width = columnDef.width || 100
+      totalWidth += 100
+      colGroupHTML += '<colgroup'
+      colGroupHTML += ` width="${width}"`
+      colGroupHTML += '></colgroup>'
+
       columnsHTML += '<th>' + (columnDef.th || defaultColumnRender)(columnDef) + '</th>'
 
       return _def
     })
-    this.ui.$columns.innerHTML = `<thead><tr>${columnsHTML}</tr></thead>`
+    this._colgroups = colGroupHTML
+    this._totalWidth = totalWidth
+    this.ui.$columns.innerHTML = `${colGroupHTML}<thead><tr>${columnsHTML}</tr></thead>`
   }
 
   /**
@@ -118,23 +128,27 @@ class DataGrid extends Event {
 
     this.emit('beforeRenderBody', bodyHTMLArray)
 
-    this.ui.$body.innerHTML = `<tbody>${bodyHTMLArray.join('')}</tbody>`
+    this.ui.$body.innerHTML = `${this._colgroups}<tbody>${bodyHTMLArray.join('')}</tbody>`
   }
 
   /**
    * 调整各种尺寸
    */
   resize () {
+    const { _totalWidth } = this
     const totalHeight = this.options.height
     const columnsHeight = this.ui.$columnsWrapper.clientHeight
     const bodyHeight = totalHeight - columnsHeight
     const obj = {
       totalHeight,
       columnsHeight,
-      bodyHeight
+      bodyHeight,
+      totalWidth: _totalWidth
     }
-    this.emit('beforeSetBodyHeight', obj)
+    this.emit('beforeSetSize', obj)
     this.ui.$bodyWrapper.style.height = obj.bodyHeight + 'px'
+    this.ui.$body.style.width = obj.totalWidth + 'px'
+    this.ui.$columns.style.width = obj.totalWidth + 'px'
   }
 }
 

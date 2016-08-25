@@ -79,7 +79,7 @@ export default function (datagrid) {
     })
   })
 
-  datagrid.on('beforeSetBodyHeight', heightObj => {
+  datagrid.on('beforeSetSize', heightObj => {
     const wrapperHeight = wrapper.clientHeight
     heightObj.pagerHeight = wrapperHeight
     heightObj.bodyHeight = heightObj.bodyHeight - wrapperHeight
