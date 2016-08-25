@@ -1,0 +1,27 @@
+@charset "utf-8";
+.datagrid {
+  .hidden {
+    display: none;
+  }
+
+  th, td {
+    text-align: center;
+    min-width: 100px;
+  }
+
+  .grid-body {
+    min-width: 100%;
+  }
+
+  .grid-columns {
+    position: relative;
+  }
+
+  .grid-columns-wrapper {
+    overflow: hidden;
+  }
+
+  .grid-body-wrapper {
+    overflow: scroll;
+  }
+}

@@ -2,6 +2,15 @@ import * as datagrid from '../src/index'
 
 const grid = datagrid.init('div')
 window.$grid = grid
+
+grid.on('beforeRenderBody', arr => {
+  arr.push('<tr><td>x</td></tr>')
+})
+
+grid.on('switchPage', no => {
+  console.log(no)
+})
+
 grid.setData({
   "columns": [
     { "name": "日期", "type": "常规", "fixed": false },
@@ -56,7 +65,7 @@ grid.setData({
     },
     { "name": "其他咨询(蜂鸟)", "type": "蜂鸟", "fixed": false }
   ],
-  "data": [
+  "rows": [
     {
       "日期": "总计",
       "总计": "289,235",
