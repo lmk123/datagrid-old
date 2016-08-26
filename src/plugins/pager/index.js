@@ -62,7 +62,10 @@ export default function (datagrid) {
   })
 
   datagrid.on('beforeSetData', data => {
-    // todo 空数据判断
+    if (datagrid.empty) {
+      wrapper.classList.add('hidden')
+      return
+    }
     const { size, total } = data
     const { cur } = pager
     const dataLength = data.rows.length
@@ -77,6 +80,7 @@ export default function (datagrid) {
     wrapper.innerHTML = pagerTemplate.replace(/\{\{(\w+)\}\}/g, (word, group) => {
       return pager[group]
     })
+    wrapper.classList.remove('hidden')
   })
 
   datagrid.on('beforeSetSize', heightObj => {

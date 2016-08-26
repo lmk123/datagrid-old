@@ -46,7 +46,8 @@ class DataGrid extends Event {
       $columnsWrapper: '.grid-columns-wrapper',
       $columns: '.grid-columns',
       $bodyWrapper: '.grid-body-wrapper',
-      $body: '.grid-body'
+      $body: '.grid-body',
+      $noData: '.grid-no-data'
     }
 
     for (let key in ui) {
@@ -69,10 +70,10 @@ class DataGrid extends Event {
    * @param {Object[]} data.rows - 数据
    */
   setData (data) {
+    this.empty = !data.rows || !data.rows.length
     this.emit('beforeSetData', data)
     this.columnsDef = data.columns
     this.rows = data.rows
-    this.empty = !!(this.rows && this.rows.length)
     this._renderColumns()
     this._renderBody()
     this.resize()
@@ -114,7 +115,9 @@ class DataGrid extends Event {
    */
   _renderBody () {
     if (this.empty) {
-      // todo 暂无数据提示
+      this.ui.$body.classList.add('hidden')
+      this.ui.$noData.classList.remove('hidden')
+      return
     }
 
     const bodyHTMLArray = this.rows.map(row => {
@@ -129,6 +132,8 @@ class DataGrid extends Event {
     this.emit('beforeRenderBody', bodyHTMLArray)
 
     this.ui.$body.innerHTML = `${this._colgroups}<tbody>${bodyHTMLArray.join('')}</tbody>`
+    this.ui.$body.classList.remove('hidden')
+    this.ui.$noData.classList.add('hidden')
   }
 
   /**
@@ -136,19 +141,23 @@ class DataGrid extends Event {
    */
   resize () {
     const { _totalWidth } = this
+    this.ui.$columns.style.width = _totalWidth + 'px' // 总长度需要先设定, 因为它会影响 columns 的高度
+
     const totalHeight = this.options.height
     const columnsHeight = this.ui.$columnsWrapper.clientHeight
     const bodyHeight = totalHeight - columnsHeight
     const obj = {
       totalHeight,
-      columnsHeight,
-      bodyHeight,
-      totalWidth: _totalWidth
+      bodyHeight
     }
     this.emit('beforeSetSize', obj)
     this.ui.$bodyWrapper.style.height = obj.bodyHeight + 'px'
-    this.ui.$body.style.width = obj.totalWidth + 'px'
-    this.ui.$columns.style.width = obj.totalWidth + 'px'
+    if (this.empty) {
+      this.ui.$noData.style.height = obj.bodyHeight + 'px'
+      this.ui.$noData.style.lineHeight = obj.bodyHeight + 'px'
+    } else {
+      this.ui.$body.style.width = _totalWidth + 'px'
+    }
   }
 }
 
