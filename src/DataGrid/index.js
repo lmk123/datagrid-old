@@ -59,6 +59,25 @@ class DataGrid extends Event {
       ui.$columns.style.left = '-' + ui.$bodyWrapper.scrollLeft + 'px'
     })
 
+    // 点击数据行时, 给出事件提示
+    ui.$body.addEventListener('click', e => {
+      // 查找被点击元素的父 tr 元素
+      let tr = e.target
+      do {
+        if (tr.tagName === 'TR') {
+          break
+        }
+        if (tr === ui.$body) {
+          tr = null
+          break
+        }
+        tr = tr.parentElement
+      } while (true)
+      if (!tr) return
+      const trIndex = Number(tr.dataset.index)
+      if (!Number.isNaN(trIndex)) this.selectRow(trIndex)
+    })
+
     this.ui = ui
     this.emit('afterInit')
   }
@@ -77,6 +96,19 @@ class DataGrid extends Event {
     this._renderColumns()
     this._renderBody()
     this.resize()
+  }
+
+  /**
+   * 选中表格中的某一行
+   * @param index
+   */
+  selectRow (index) {
+    const tr = this.ui.$body.querySelector(`tr[data-index="${index}"]`)
+    if (!tr) return
+    const selectedTR = this.ui.$body.querySelector('tr.selected')
+    if (selectedTR) selectedTR.classList.remove('selected')
+    tr.classList.add('selected')
+    this.emit('rowClicked', index)
   }
 
   /**
@@ -120,8 +152,8 @@ class DataGrid extends Event {
       return
     }
 
-    const bodyHTMLArray = this.rows.map(row => {
-      let rowHTML = '<tr>'
+    const bodyHTMLArray = this.rows.map((row, index) => {
+      let rowHTML = `<tr data-index="${index}">`
       this.columnsDef.forEach(columnDef => {
         rowHTML += '<td>' + (columnDef.td || defaultDataRender)(columnDef, row) + '</td>'
       })

@@ -4,7 +4,12 @@ const grid = datagrid.init('div')
 window.$grid = grid
 
 grid.on('beforeRenderBody', arr => {
-  arr.push('<tr><td>x</td></tr>')
+  arr.push('<tr><td>添加自定义的 HTML 片段</td></tr>')
+})
+
+// 测试 tr 点击事件
+grid.on('rowClicked', index => {
+  console.log(index)
 })
 
 // 测试切换 page 事件
