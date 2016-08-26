@@ -8,7 +8,7 @@ grid.on('beforeRenderBody', arr => {
 })
 
 // 测试 tr 点击事件
-grid.on('rowClicked', index => {
+grid.on('selectedChanged', index => {
   console.log(index)
 })
 

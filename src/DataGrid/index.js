@@ -36,6 +36,14 @@ class DataGrid extends Event {
     this._init()
   }
 
+  /**
+   * 重置各种状态
+   * @private
+   */
+  _reset () {
+    this._selectRowIndex = -1
+  }
+
   _init () {
     this.emit('beforeInit')
     const { el } = this
@@ -75,7 +83,7 @@ class DataGrid extends Event {
       } while (true)
       if (!tr) return
       const trIndex = Number(tr.dataset.index)
-      if (!Number.isNaN(trIndex)) this.selectRow(trIndex)
+      if (!Number.isNaN(trIndex) && this._selectRowIndex !== trIndex) this.selectRow(trIndex)
     })
 
     this.ui = ui
@@ -89,6 +97,7 @@ class DataGrid extends Event {
    * @param {Object[]} data.rows - 数据
    */
   setData (data) {
+    this._reset()
     this.empty = !data.rows || !data.rows.length
     this.emit('beforeSetData', data)
     this.columnsDef = data.columns
@@ -108,7 +117,8 @@ class DataGrid extends Event {
     const selectedTR = this.ui.$body.querySelector('tr.selected')
     if (selectedTR) selectedTR.classList.remove('selected')
     tr.classList.add('selected')
-    this.emit('rowClicked', index)
+    this._selectRowIndex = index
+    this.emit('selectedChanged', index)
   }
 
   /**
