@@ -1,0 +1,16 @@
+@charset "utf-8";
+
+.datagrid {
+  .order-ico {
+    display: none;
+  }
+
+  .order-by-asc .order-ico,
+  .order-by-desc .order-ico {
+    display: inline-block;
+  }
+
+  .order-by-desc .order-ico {
+    transform: rotate(180deg);
+  }
+}

@@ -28,11 +28,11 @@ class DataGrid extends Event {
 
   constructor (ele, options) {
     super()
-    plugins.forEach(plugin => plugin(this))
     this.el = ele
     this.options = Object.assign({}, {
       height: ele.clientHeight // 表格的总高度,
     }, options)
+    plugins.forEach(plugin => plugin(this))
     this._init()
   }
 
@@ -200,6 +200,7 @@ class DataGrid extends Event {
     } else {
       this.ui.$body.style.width = _totalWidth + 'px'
     }
+    this.emit('afterSetSize')
   }
 }
 

@@ -14,7 +14,8 @@ class MyEvent {
     const eventArr = (_callbacks[eventName] || (_callbacks[eventName] = []))
     eventArr.push(handlerFunc)
     return () => {
-      eventArr.splice(eventArr.indexOf(handlerFunc), 1)
+      const i = eventArr.indexOf(handlerFunc)
+      if (i >= 0) eventArr.splice(i, 1)
     }
   }
 
@@ -27,7 +28,8 @@ class MyEvent {
   once (eventName, handlerFunc) {
     const unwatch = this.on(eventName, function () {
       handlerFunc.apply(null, arguments)
-      unwatch()
+      // 等 emit 中的 forEach 执行完后再改变数组
+      window.setTimeout(unwatch, 0)
     })
     return unwatch
   }

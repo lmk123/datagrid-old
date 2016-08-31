@@ -1,6 +1,8 @@
 import * as datagrid from '../src/index'
 
-const grid = datagrid.init('div')
+const grid = datagrid.init('div', {
+  sortable: true
+})
 window.$grid = grid
 
 grid.on('beforeRenderBody', arr => {
@@ -9,12 +11,19 @@ grid.on('beforeRenderBody', arr => {
 
 // 测试 tr 点击事件
 grid.on('selectedChanged', index => {
-  console.log(index)
+  console.log('点击了第几行的数据', index)
 })
 
 // 测试切换 page 事件
 grid.on('switchPage', no => {
-  console.log(no)
+  console.log('翻页事件:', no)
+})
+
+// 测试排序事件
+grid.on('sort', (column, dir, th) => {
+  console.log('排序事件, 要排序的字段是:', column)
+  console.log('排序事件, 要排序的方向是:', dir, '。大于0表示升序,小于0表示降序,等于0表示不排序')
+  console.log('排序事件, 被排序的 th 元素是:', th)
 })
 
 // 测试设置空数据
