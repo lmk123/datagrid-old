@@ -9,53 +9,60 @@ const NONE_ORDER = 0 // 不排序
 const CLASS_ASC = 'order-by-asc'
 const CLASS_DESC = 'order-by-desc'
 
-export default function (datagrid) {
-  if (!datagrid.options.sortable) return
+export default function (DataGrid) {
+  DataGrid.hook(function (datagrid) {
+    if (!datagrid.options.sortable) return
 
-  datagrid.on('afterInit', () => {
-    // 使用一个数组保存每个字段当前的排序状态
-    const state = []
+    // 使用一个对象保存每个字段当前的排序状态
+    let state = {}
 
-    // 给每个字段内部注入小箭头
-    datagrid.on('afterSetSize', () => {
-      forEach.call(datagrid.ui.$columns.querySelectorAll('th'), th => {
-        th.insertAdjacentHTML('beforeEnd', '<span class="order-ico">2</span>')
+    datagrid.on('afterInit', () => {
+
+      // 给每个字段内部注入小箭头
+      datagrid.on('afterSetSize', () => {
+        forEach.call(datagrid.ui.$columns.querySelectorAll('th'), th => {
+          th.insertAdjacentHTML('beforeEnd', '<span class="order-ico">2</span>')
+        })
       })
-    })
 
-    // 监听字段的点击事件
-    const { $columnsWrapper } = datagrid.ui
-    $columnsWrapper.addEventListener('click', e => {
-      let th
-      let node = e.target
-      do {
-        if (node.tagName === 'TH') {
-          th = node
-          break
+      // 监听字段的点击事件
+      const { $columnsWrapper } = datagrid.ui
+      $columnsWrapper.addEventListener('click', e => {
+        let th
+        let node = e.target
+        do {
+          if (node.tagName === 'TH') {
+            th = node
+            break
+          }
+          node = node.parentElement
+        } while (node !== $columnsWrapper)
+        if (!th) return
+        const index = indexOf.call(th.parentElement.children, th)
+        const columnDef = datagrid.columnsDef[index]
+        if (columnDef.sortable === false) return
+        forEach.call($columnsWrapper.querySelectorAll(`.${CLASS_DESC}, .${CLASS_ASC}`), th => {
+          th.classList.remove(CLASS_ASC, CLASS_DESC)
+        })
+        const order = state[index] || NONE_ORDER
+        state = {}
+        switch (order) {
+          case NONE_ORDER:
+            state[index] = ASC
+            th.classList.add(CLASS_ASC)
+            break
+          case ASC:
+            state[index] = DESC
+            th.classList.add(CLASS_DESC)
+            break
+          case DESC:
+            state[index] = NONE_ORDER
+            break
         }
-        node = node.parentElement
-      } while (node !== $columnsWrapper)
-      if (!th) return
-      const index = indexOf.call(th.parentElement.children, th)
-      const columnDef = datagrid.columnsDef[index]
-      if (columnDef.sortable === false) return
-      forEach.call($columnsWrapper.querySelectorAll(`.${CLASS_DESC}, .${CLASS_ASC}`), th => {
-        th.classList.remove(CLASS_ASC, CLASS_DESC)
+        datagrid.emit('sort', columnDef, state[index], th)
       })
-      switch (state[index] || NONE_ORDER) {
-        case NONE_ORDER:
-          state[index] = ASC
-          th.classList.add(CLASS_ASC)
-          break
-        case ASC:
-          state[index] = DESC
-          th.classList.add(CLASS_DESC)
-          break
-        case DESC:
-          state[index] = NONE_ORDER
-          break
-      }
-      datagrid.emit('sort', columnDef, state[index], th)
     })
   })
 }
+
+

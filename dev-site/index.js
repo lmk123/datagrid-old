@@ -1,8 +1,9 @@
-import * as datagrid from '../src/index'
+import DataGrid from '../src/index'
 
-const grid = datagrid.init('div', {
+const grid = new DataGrid(document.querySelector('div'), {
   sortable: true
 })
+
 window.$grid = grid
 
 grid.on('beforeRenderBody', arr => {

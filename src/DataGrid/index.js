@@ -2,8 +2,6 @@ import './index.scss'
 import containerTemplate from './template.html'
 import Event from '../utils/event'
 
-const plugins = []
-
 function defaultColumnRender (columnDef) {
   return columnDef.name
 }
@@ -11,6 +9,8 @@ function defaultColumnRender (columnDef) {
 function defaultDataRender (columnDef, rowData) {
   return rowData[columnDef.key]
 }
+
+const hooks = []
 
 class DataGrid extends Event {
   /**
@@ -22,8 +22,18 @@ class DataGrid extends Event {
       if (typeof plugin !== 'function') {
         throw new TypeError('.use(plugin) 参数类型错误: plugin 必需是一个函数。')
       }
+      if (plugin._installed) return
+      plugin._installed = true
     }
-    if (plugins.indexOf(plugin) < 0) plugins.push(plugin)
+    plugin(DataGrid)
+  }
+
+  static hook (fn) {
+    hooks.push(fn)
+    return () => {
+      const i = hooks.indexOf(fn)
+      if (i >= 0) hooks.splice(i, 1)
+    }
   }
 
   constructor (ele, options) {
@@ -32,7 +42,7 @@ class DataGrid extends Event {
     this.options = Object.assign({}, {
       height: ele.clientHeight // 表格的总高度,
     }, options)
-    plugins.forEach(plugin => plugin(this))
+    hooks.forEach(fn => fn(this))
     this._init()
   }
 
