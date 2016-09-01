@@ -62,7 +62,7 @@ export default function (DataGrid) {
     })
 
     datagrid.on('beforeSetData', data => {
-      if (datagrid.empty) {
+      if (!data.rows || !data.rows.length) {
         wrapper.classList.add('hidden')
         return
       }

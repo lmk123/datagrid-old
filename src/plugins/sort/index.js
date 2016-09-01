@@ -19,7 +19,7 @@ export default function (DataGrid) {
     datagrid.on('afterInit', () => {
 
       // 给每个字段内部注入小箭头
-      datagrid.on('afterSetSize', () => {
+      datagrid.on('afterSetData', () => {
         forEach.call(datagrid.ui.$columns.querySelectorAll('th'), th => {
           th.insertAdjacentHTML('beforeEnd', '<span class="order-ico">2</span>')
         })
@@ -39,7 +39,7 @@ export default function (DataGrid) {
         } while (node !== $columnsWrapper)
         if (!th) return
         const index = indexOf.call(th.parentElement.children, th)
-        const columnDef = datagrid.columnsDef[index]
+        const columnDef = datagrid.renderData.columnsDef[index]
         if (columnDef.sortable === false) return
         forEach.call($columnsWrapper.querySelectorAll(`.${CLASS_DESC}, .${CLASS_ASC}`), th => {
           th.classList.remove(CLASS_ASC, CLASS_DESC)

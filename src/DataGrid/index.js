@@ -52,6 +52,7 @@ class DataGrid extends Event {
    */
   _reset () {
     this._selectRowIndex = -1
+    this.renderData = {}
   }
 
   _init () {
@@ -63,8 +64,12 @@ class DataGrid extends Event {
     const ui = {
       $columnsWrapper: '.grid-columns-wrapper',
       $columns: '.grid-columns',
+      $columnsColGroup: '.grid-columns colgroup',
+      $columnsThead: '.grid-columns thead',
       $bodyWrapper: '.grid-body-wrapper',
       $body: '.grid-body',
+      $bodyColGroup: '.grid-body colgroup',
+      $bodyTbody: '.grid-body tbody',
       $noData: '.grid-no-data'
     }
 
@@ -105,96 +110,114 @@ class DataGrid extends Event {
    * @param data
    * @param {String[]|Object[]} data.columns - 表格的字段定义
    * @param {Object[]} data.rows - 数据
+   * @param {Number[]} data.width - 每个字段对应的宽度
    */
   setData (data) {
-    this._reset()
-    this.empty = !data.rows || !data.rows.length
     this.emit('beforeSetData', data)
-    this.columnsDef = data.columns
-    this.rows = data.rows
-    this._renderColumns()
+    this._reset()
+    this._setColumns(data.columns)
+    this._setBody(data.rows)
+    this._setWidth(data.width)
+    this.emit('afterSetData')
+  }
+
+  _setWidth (widthArr) {
+    if (widthArr) {
+      this.renderData.columnsWidth = widthArr
+    }
+    this._colGroupsHTML()
+    this._renderCols()
+    this._resize()
+  }
+
+  _setBody (rows) {
+    this.empty = !rows || !rows.length
+    this.rows = rows
+    this._bodyHTML()
     this._renderBody()
-    this.resize()
+  }
+
+  _setColumns (columns) {
+    this._normalize(columns)
+    this._columnsHTML()
+    this._renderColumns()
   }
 
   /**
-   * 选中表格中的某一行
-   * @param index
-   */
-  selectRow (index) {
-    const tr = this.ui.$body.querySelector(`tr[data-index="${index}"]`)
-    if (!tr) return
-    const selectedTR = this.ui.$body.querySelector('tr.selected')
-    if (selectedTR) selectedTR.classList.remove('selected')
-    tr.classList.add('selected')
-    this._selectRowIndex = index
-    this.emit('selectedChanged', index)
-  }
-
-  /**
-   * 渲染表头
+   * 调整字段定义, 并根据字段定义计算出每个字段的宽度数组
+   * @param columns
    * @private
    */
-  _renderColumns () {
-    let columnsHTML = ''
-    let colGroupHTML = ''
-    let totalWidth = 0
-    this.columnsDef.map(columnDef => {
+  _normalize (columns) {
+    const result = columns.map(columnDef => {
       const _def = typeof columnDef === 'string'
         ? { name: columnDef }
         : columnDef
 
-      if (!columnDef.key) columnDef.key = columnDef.name
-
-      const width = columnDef.width || 100
-      totalWidth += 100
-      colGroupHTML += '<colgroup'
-      colGroupHTML += ` width="${width}"`
-      colGroupHTML += '></colgroup>'
-
-      columnsHTML += '<th>' + (columnDef.th || defaultColumnRender)(columnDef) + '</th>'
-
+      if (!_def.key) _def.key = _def.name
+      if (!_def.width) _def.width = 100
       return _def
     })
-    this._colgroups = colGroupHTML
-    this._totalWidth = totalWidth
-    this.ui.$columns.innerHTML = `${colGroupHTML}<thead><tr>${columnsHTML}</tr></thead>`
+    this.renderData.columnsDef = result
   }
 
   /**
-   * 渲染数据
+   * 计算出表格的 col 元素的 HTML
    * @private
    */
+  _colGroupsHTML () {
+    this.renderData.colsHTMLArr = this.renderData.columnsWidth ? this.renderData.columnsWidth.map((width) => {
+      return `<col style="width:${width}px">`
+    }, '') : []
+  }
+
+  /**
+   * 计算出渲染表头字段的 HTML
+   * @private
+   */
+  _columnsHTML () {
+    this.renderData.columnsHTMLArr = this.renderData.columnsDef.map((columnDef) => {
+      return '<th>' + (columnDef.th || defaultColumnRender)(columnDef) + '</th>'
+    }, '')
+  }
+
+  /**
+   * 计算出渲染 body 需要的数据
+   * @private
+   */
+  _bodyHTML () {
+    this.renderData.trsArr = this.empty ? [] : this.rows.map((row, index) => {
+      let rowHTML = `<tr data-index="${index}">`
+      this.renderData.columnsDef.forEach(columnDef => {
+        rowHTML += '<td>' + (columnDef.td || defaultDataRender)(columnDef, row) + '</td>'
+      })
+      rowHTML += '</tr>'
+      return rowHTML
+    })
+  }
+
+  _renderColumns () {
+    this.ui.$columnsThead.innerHTML = this.renderData.columnsHTMLArr.join('')
+  }
+
+  _renderCols () {
+    this.ui.$columnsColGroup.innerHTML = this.ui.$bodyColGroup.innerHTML = this.renderData.colsHTMLArr.join('')
+  }
+
   _renderBody () {
     if (this.empty) {
       this.ui.$body.classList.add('hidden')
       this.ui.$noData.classList.remove('hidden')
       return
     }
-
-    const bodyHTMLArray = this.rows.map((row, index) => {
-      let rowHTML = `<tr data-index="${index}">`
-      this.columnsDef.forEach(columnDef => {
-        rowHTML += '<td>' + (columnDef.td || defaultDataRender)(columnDef, row) + '</td>'
-      })
-      rowHTML += '</tr>'
-      return rowHTML
-    })
-
-    this.emit('beforeRenderBody', bodyHTMLArray)
-
-    this.ui.$body.innerHTML = `${this._colgroups}<tbody>${bodyHTMLArray.join('')}</tbody>`
+    this.ui.$bodyTbody.innerHTML = this.renderData.trsArr.join('')
     this.ui.$body.classList.remove('hidden')
     this.ui.$noData.classList.add('hidden')
   }
 
-  /**
-   * 调整各种尺寸
-   */
-  resize () {
-    const { _totalWidth } = this
-    this.ui.$columns.style.width = _totalWidth + 'px' // 总长度需要先设定, 因为它会影响 columns 的高度
-
+  _resize () {
+    const _totalWidth = this.renderData.columnsWidth ? this.renderData.columnsWidth.reduce((prev, width) => prev + width) : this.el.clientWidth
+    this.ui.$columns.style.width = _totalWidth + 'px' // 总长度需要先设定, 因为它会影响 columnsWrapper.clientHeight
     const totalHeight = this.options.height
     const columnsHeight = this.ui.$columnsWrapper.clientHeight
     const bodyHeight = totalHeight - columnsHeight
@@ -210,7 +233,20 @@ class DataGrid extends Event {
     } else {
       this.ui.$body.style.width = _totalWidth + 'px'
     }
-    this.emit('afterSetSize')
+  }
+
+  /**
+   * 选中表格中的某一行
+   * @param index
+   */
+  selectRow (index) {
+    const tr = this.ui.$body.querySelector(`tr[data-index="${index}"]`)
+    if (!tr) return
+    const selectedTR = this.ui.$body.querySelector('tr.selected')
+    if (selectedTR) selectedTR.classList.remove('selected')
+    tr.classList.add('selected')
+    this._selectRowIndex = index
+    this.emit('selectedChanged', index)
   }
 }
 
