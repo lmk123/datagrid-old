@@ -16,15 +16,14 @@ export default function (DataGrid) {
     // 使用一个对象保存每个字段当前的排序状态
     let state = {}
 
-    datagrid.on('afterInit', () => {
-
-      // 给每个字段内部注入小箭头
-      datagrid.on('afterSetData', () => {
-        forEach.call(datagrid.ui.$columns.querySelectorAll('th'), th => {
-          th.insertAdjacentHTML('beforeEnd', '<span class="order-ico">2</span>')
-        })
+    // 给每个字段内部注入小箭头
+    datagrid.on('beforeRenderColumns', columnsHTMLArr => {
+      columnsHTMLArr.forEach((html, index) => {
+        columnsHTMLArr[index] = html.replace('</th>', '<span class="order-ico">2</span></th>')
       })
+    })
 
+    datagrid.once('afterInit', () => {
       // 监听字段的点击事件
       const { $columnsWrapper } = datagrid.ui
       $columnsWrapper.addEventListener('click', e => {

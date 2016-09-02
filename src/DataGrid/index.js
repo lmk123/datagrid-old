@@ -179,6 +179,7 @@ class DataGrid extends Event {
     this.renderData.columnsHTMLArr = this.renderData.columnsDef.map((columnDef) => {
       return '<th>' + (columnDef.th || defaultColumnRender)(columnDef) + '</th>'
     }, '')
+    this.emit('beforeRenderColumns', this.renderData.columnsHTMLArr)
   }
 
   /**
