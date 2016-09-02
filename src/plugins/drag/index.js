@@ -1,3 +1,5 @@
+import './index.scss'
+
 const { indexOf } = Array.prototype
 
 const IS_TOUCH = 'ontouchstart' in window
@@ -14,14 +16,23 @@ export default function (DataGrid) {
       })
     })
 
+    datagrid.on('afterInit', () => {
+      const line = document.createElement('div')
+      line.classList.add('dragging-line')
+      datagrid.ui.$draggingLine = line
+      datagrid.el.appendChild(line)
+    })
+
     let dragging = false
     let draggingLever
     let draggingColumnIndex
     let startX
+    let draggingLineInitLeft
 
     datagrid.el.addEventListener(MOUSEDOWN, e => {
       if (e.target.classList.contains('drag-lever') && e.button === 0) {
         console.log('开始移动')
+
         let th
         let node = e.target
         while ((node = node.parentElement) && node !== datagrid.el) {
@@ -31,6 +42,14 @@ export default function (DataGrid) {
           }
         }
         if (!th) return
+
+        // 显示虚线
+        const line = datagrid.ui.$draggingLine
+        line.style.height = datagrid.ui.$columnsWrapper.clientHeight + datagrid.ui.$bodyWrapper.clientHeight + 'px'
+        draggingLineInitLeft = th.offsetLeft + th.clientWidth - datagrid.ui.$bodyWrapper.scrollLeft
+        line.style.left = draggingLineInitLeft + 'px'
+        line.classList.add('show')
+
         dragging = true
         draggingLever = e.target
         draggingLever.classList.add('dragging')
@@ -42,11 +61,14 @@ export default function (DataGrid) {
     datagrid.el.addEventListener(MOUSEMOVE, e => {
       if (!dragging) return
       e.preventDefault() // 阻止在 PC 端拖动鼠标时选中文字或在移动端滑动屏幕
+      // 调整虚线的 left 值
+      datagrid.ui.$draggingLine.style.left = draggingLineInitLeft + (e.pageX - startX) + 'px'
     })
 
     datagrid.el.addEventListener(MOUSEUP, e => {
       if (!dragging) return
       console.log('结束移动')
+      datagrid.ui.$draggingLine.classList.remove('show')
       dragging = false
       draggingLever.classList.remove('dragging')
       const endX = e.pageX

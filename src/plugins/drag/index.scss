@@ -1,0 +1,18 @@
+@charset "utf-8";
+
+.datagrid {
+  position: relative;
+
+  .dragging-line {
+    position: absolute;
+    display: none;
+    width: 0;
+    border-right: 1px dotted gray;
+    top: 0;
+    left: 0;
+
+    &.show {
+      display: block;
+    }
+  }
+}
