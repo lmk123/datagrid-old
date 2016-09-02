@@ -1,5 +1,10 @@
 const { indexOf } = Array.prototype
 
+const IS_TOUCH = 'ontouchstart' in window
+const MOUSEDOWN = IS_TOUCH ? 'touchstart' : 'mousedown'
+const MOUSEMOVE = IS_TOUCH ? 'touchmove' : 'mousemove'
+const MOUSEUP = IS_TOUCH ? 'touchend' : 'mouseup'
+
 export default function (DataGrid) {
   DataGrid.hook(datagrid => {
     // 注入供用户拖拽的小方块
@@ -14,7 +19,7 @@ export default function (DataGrid) {
     let draggingColumnIndex
     let startX
 
-    datagrid.el.addEventListener('mousedown', e => {
+    datagrid.el.addEventListener(MOUSEDOWN, e => {
       if (e.target.classList.contains('drag-lever') && e.button === 0) {
         console.log('开始移动')
         let th
@@ -34,12 +39,12 @@ export default function (DataGrid) {
       }
     })
 
-    datagrid.el.addEventListener('mousemove', e => {
+    datagrid.el.addEventListener(MOUSEMOVE, e => {
       if (!dragging) return
-      e.preventDefault() // 阻止拖动鼠标时选中文字
+      e.preventDefault() // 阻止在 PC 端拖动鼠标时选中文字或在移动端滑动屏幕
     })
 
-    datagrid.el.addEventListener('mouseup', e => {
+    datagrid.el.addEventListener(MOUSEUP, e => {
       if (!dragging) return
       console.log('结束移动')
       dragging = false
