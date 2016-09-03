@@ -1,5 +1,7 @@
 import './index.scss'
 
+const MIN_WIDTH = 100 // 表格的最小宽度
+
 const { indexOf } = Array.prototype
 
 const IS_TOUCH = 'ontouchstart' in window
@@ -28,11 +30,10 @@ export default function (DataGrid) {
     let draggingColumnIndex
     let startX
     let draggingLineInitLeft
+    let minLeft
 
     datagrid.el.addEventListener(MOUSEDOWN, e => {
       if (e.target.classList.contains('drag-lever') && e.button === 0) {
-        console.log('开始移动')
-
         let th
         let node = e.target
         while ((node = node.parentElement) && node !== datagrid.el) {
@@ -42,6 +43,8 @@ export default function (DataGrid) {
           }
         }
         if (!th) return
+
+        minLeft = -(th.clientWidth - MIN_WIDTH)
 
         // 显示虚线
         const line = datagrid.ui.$draggingLine
@@ -62,19 +65,20 @@ export default function (DataGrid) {
       if (!dragging) return
       e.preventDefault() // 阻止在 PC 端拖动鼠标时选中文字或在移动端滑动屏幕
       // 调整虚线的 left 值
-      datagrid.ui.$draggingLine.style.left = draggingLineInitLeft + (e.pageX - startX) + 'px'
+      const moved = e.pageX - startX
+      if (moved > minLeft) {
+        datagrid.ui.$draggingLine.style.left = draggingLineInitLeft + (e.pageX - startX) + 'px'
+      }
     })
 
     datagrid.el.addEventListener(MOUSEUP, e => {
       if (!dragging) return
-      console.log('结束移动')
       datagrid.ui.$draggingLine.classList.remove('show')
       dragging = false
       draggingLever.classList.remove('dragging')
-      const endX = e.pageX
-      const move = endX - startX // 计算移动的距离
-      console.log('移动了', move)
-      datagrid.renderData.columnsWidth[draggingColumnIndex] = datagrid.renderData.columnsWidth[draggingColumnIndex] + move
+      let moved = e.pageX - startX // 计算移动的距离
+      if (moved < minLeft) moved = minLeft
+      datagrid.renderData.columnsWidth[draggingColumnIndex] = datagrid.renderData.columnsWidth[draggingColumnIndex] + moved
       datagrid._setWidth(datagrid.renderData.columnsWidth)
     })
   })
