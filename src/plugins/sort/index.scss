@@ -2,7 +2,16 @@
 
 .datagrid {
   .order-ico {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    right: 4px;
     display: none;
+    width: 0;
+    height: 0;
+    border-style: solid;
+    border-width: 0 5px 5px 5px;
+    border-color: transparent transparent #868686 transparent;
   }
 
   .order-by-asc .order-ico,
@@ -11,6 +20,6 @@
   }
 
   .order-by-desc .order-ico {
-    transform: rotate(180deg);
+    transform: translateY(-50%) rotate(180deg);
   }
 }

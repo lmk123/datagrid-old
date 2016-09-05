@@ -1,15 +1,13 @@
 @charset "utf-8";
-
 .datagrid {
-  position: relative;
 
-  th {
-    position: relative;
-
-    .drag-lever {
-      position: absolute;
-      right: 0;
-    }
+  .drag-lever {
+    position: absolute;
+    width: 4px;
+    cursor: col-resize;
+    top: 0;
+    bottom: 0;
+    right: 0;
   }
 
   .dragging-line {

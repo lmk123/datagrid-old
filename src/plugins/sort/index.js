@@ -19,7 +19,7 @@ export default function (DataGrid) {
     // 给每个字段内部注入小箭头
     datagrid.on('beforeRenderColumns', columnsHTMLArr => {
       columnsHTMLArr.forEach((html, index) => {
-        columnsHTMLArr[index] = html.replace('</th>', '<span class="order-ico">2</span></th>')
+        columnsHTMLArr[index] = html.replace('</th>', '<span class="order-ico"></span></th>')
       })
     })
 

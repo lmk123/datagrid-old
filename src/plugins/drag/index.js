@@ -14,7 +14,7 @@ export default function (DataGrid) {
     // 注入供用户拖拽的小方块
     datagrid.on('beforeRenderColumns', columnsHTMLArr => {
       columnsHTMLArr.forEach((html, index) => {
-        columnsHTMLArr[index] = html.replace('</th>', '<span class="drag-lever">x</span></th>')
+        columnsHTMLArr[index] = html.replace('</th>', '<span class="drag-lever"></span></th>')
       })
     })
 

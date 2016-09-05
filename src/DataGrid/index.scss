@@ -1,5 +1,7 @@
 @charset "utf-8";
 .datagrid {
+  position: relative; // 方便定位
+
   .hidden {
     display: none;
   }
@@ -8,6 +10,10 @@
     text-align: center;
   }
 
+  th {
+    position: relative; // 方便定位
+    padding: 0 20px; // 方便添加其它小图表, 例如排序时的三角箭头
+  }
   .grid-body {
     //min-width: 100%;
   }
