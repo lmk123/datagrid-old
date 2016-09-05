@@ -6,6 +6,11 @@
     display: none;
   }
 
+  table {
+    border-collapse: collapse;
+    border-spacing: 0;
+  }
+
   th, td {
     text-align: center;
   }
@@ -32,5 +37,38 @@
 
   .grid-no-data {
     text-align: center;
+  }
+}
+
+// 下面的样式是一些可以被覆盖的
+.datagrid {
+  background-color: #fff;
+  font-size: 12px;
+  color: #333;
+
+  th {
+    font-weight: bold;
+  }
+
+  tr {
+    height: 34px;
+
+    &:hover {
+      background-color: #f3f3f3 !important;
+    }
+  }
+
+  .grid-columns-wrapper {
+    background-color: #f8f8f8;
+    border: 1px solid #e7eaec;
+  }
+
+  .grid-body-wrapper {
+    border: 1px solid #e7eaec;
+    border-top: none;
+  }
+
+  .grid-body-wrapper tbody tr:nth-child(2n) {
+    background-color: #f8f8f8;
   }
 }
