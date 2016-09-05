@@ -3,6 +3,15 @@
 .datagrid {
   position: relative;
 
+  th {
+    position: relative;
+
+    .drag-lever {
+      position: absolute;
+      right: 0;
+    }
+  }
+
   .dragging-line {
     position: absolute;
     display: none;

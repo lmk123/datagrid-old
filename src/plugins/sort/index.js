@@ -37,6 +37,7 @@ export default function (DataGrid) {
           node = node.parentElement
         } while (node !== $columnsWrapper)
         if (!th) return
+        if (th.classList.contains('resizing')) return
         const index = indexOf.call(th.parentElement.children, th)
         const columnDef = datagrid.renderData.columnsDef[index]
         if (columnDef.sortable === false) return

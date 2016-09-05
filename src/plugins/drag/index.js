@@ -27,6 +27,7 @@ export default function (DataGrid) {
 
     let dragging = false
     let draggingLever
+    let draggingTH
     let draggingColumnIndex
     let startX
     let draggingLineInitLeft
@@ -43,6 +44,10 @@ export default function (DataGrid) {
           }
         }
         if (!th) return
+
+        // 给 th 加一个状态, 避免触发排序功能
+        th.classList.add('resizing')
+        draggingTH = th
 
         minLeft = -(th.clientWidth - MIN_WIDTH)
 
@@ -61,7 +66,7 @@ export default function (DataGrid) {
       }
     })
 
-    datagrid.el.addEventListener(MOUSEMOVE, e => {
+    document.addEventListener(MOUSEMOVE, e => {
       if (!dragging) return
       e.preventDefault() // 阻止在 PC 端拖动鼠标时选中文字或在移动端滑动屏幕
       // 调整虚线的 left 值
@@ -71,8 +76,10 @@ export default function (DataGrid) {
       }
     })
 
-    datagrid.el.addEventListener(MOUSEUP, e => {
+    document.addEventListener(MOUSEUP, e => {
       if (!dragging) return
+      // 等 ../sort/index.js 里的 click 事件处理完后再移除这个 CSS 类
+      setTimeout(() => draggingTH.classList.remove('resizing'), 0)
       datagrid.ui.$draggingLine.classList.remove('show')
       dragging = false
       draggingLever.classList.remove('dragging')
