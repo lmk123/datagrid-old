@@ -12,7 +12,7 @@ baseConfig.plugins.push(
     filename: 'index.html',
     template: './dev-site/index.html'
   }),
-  new OpenPack()
+  new OpenPack({ lan: true })
 )
 
 baseConfig.devServer = {

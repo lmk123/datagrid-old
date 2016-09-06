@@ -1,6 +1,8 @@
 import './index.scss'
 import containerTemplate from './template.html'
-import Event from '../utils/event'
+import Event from '../utils/Event'
+import findParent from '../utils/findParent'
+import addEvent from '../utils/addEvent'
 
 function defaultColumnRender (columnDef) {
   return columnDef.name
@@ -28,6 +30,11 @@ class DataGrid extends Event {
     plugin(DataGrid)
   }
 
+  /**
+   * 每次创建新的实例时都会触发这个函数
+   * @param {Function} fn
+   * @return {function()}
+   */
   static hook (fn) {
     hooks.push(fn)
     return () => {
@@ -36,11 +43,16 @@ class DataGrid extends Event {
     }
   }
 
+  /**
+   * 构造函数
+   * @param {HTMLElement} ele
+   * @param {Object} [options]
+   */
   constructor (ele, options) {
     super()
     this.el = ele
     this.options = Object.assign({}, {
-      height: ele.clientHeight // 表格的总高度,
+      height: ele.clientHeight // 表格的总高度
     }, options)
     hooks.forEach(fn => fn(this))
     this._init()
@@ -56,6 +68,7 @@ class DataGrid extends Event {
   }
 
   _init () {
+    const _unbindEvents = this._unbindEvents = []
     this.emit('beforeInit')
     const { el } = this
     el.classList.add('datagrid')
@@ -77,25 +90,17 @@ class DataGrid extends Event {
       ui[key] = el.querySelector(ui[key])
     }
 
-    // body 横向滚动时, 也要调整 columns 的左边距
-    ui.$bodyWrapper.addEventListener('scroll', () => {
-      ui.$columns.style.left = '-' + ui.$bodyWrapper.scrollLeft + 'px'
-    })
+    _unbindEvents.push(
+      // body 横向滚动时, 也要调整 columns 的左边距
+      addEvent(ui.$bodyWrapper, 'scroll', () => {
+        ui.$columns.style.left = '-' + ui.$bodyWrapper.scrollLeft + 'px'
+      })
+    )
 
     // 点击数据行时, 给出事件提示
+    // todo 使用插件提供此功能
     ui.$body.addEventListener('click', e => {
-      // 查找被点击元素的父 tr 元素
-      let tr = e.target
-      do {
-        if (tr.tagName === 'TR') {
-          break
-        }
-        if (tr === ui.$body) {
-          tr = null
-          break
-        }
-        tr = tr.parentElement
-      } while (true)
+      const tr = findParent('tr', e.target, ui.$body)
       if (!tr) return
       const trIndex = Number(tr.dataset.index)
       if (!Number.isNaN(trIndex) && this._selectRowIndex !== trIndex) this.selectRow(trIndex)
@@ -115,110 +120,52 @@ class DataGrid extends Event {
   setData (data) {
     this.emit('beforeSetData', data)
     this._reset()
-    this._setColumns(data.columns)
-    this._setBody(data.rows)
-    this._setWidth(data.width)
+    this.setColumns(data.columns)
+    this.setBody(data.rows)
+    this.setWidth(data.width)
     this.emit('afterSetData')
   }
 
-  _setWidth (widthArr) {
+  setWidth (widthArr) {
     if (widthArr) {
       this.renderData.columnsWidth = widthArr
+    } else {
+      widthArr = this.renderData.columnsWidth
     }
-    this._colGroupsHTML()
-    this._renderCols()
-    this._resize()
-  }
-
-  _setBody (rows) {
-    this.empty = !rows || !rows.length
-    this.rows = rows
-    this._bodyHTML()
-    this._renderBody()
-  }
-
-  _setColumns (columns) {
-    this._normalize(columns)
-    this._columnsHTML()
-    this._renderColumns()
-  }
-
-  /**
-   * 调整字段定义, 并根据字段定义计算出每个字段的宽度数组
-   * @param columns
-   * @private
-   */
-  _normalize (columns) {
-    const result = columns.map(columnDef => {
-      const _def = typeof columnDef === 'string'
-        ? { name: columnDef }
-        : columnDef
-
-      if (!_def.key) _def.key = _def.name
-      if (!_def.width) _def.width = 100
-      return _def
-    })
-    this.renderData.columnsDef = result
+    const cols = this._colGroupsHTML(widthArr)
+    this._renderCols(cols)
+    this._resize(widthArr)
   }
 
   /**
    * 计算出表格的 col 元素的 HTML
+   * @param {Number[]} columnsWidth - 定义字段宽度的数组
    * @private
+   * @return {String[]}
    */
-  _colGroupsHTML () {
-    this.renderData.colsHTMLArr = this.renderData.columnsWidth ? this.renderData.columnsWidth.map((width) => {
-      return `<col style="width:${width}px">`
-    }, '') : []
+  _colGroupsHTML (columnsWidth) {
+    return columnsWidth ? columnsWidth.map(width => `<col style="width:${width}px">`) : []
   }
 
   /**
-   * 计算出渲染表头字段的 HTML
+   * 填充 colsHTML
+   * @param {String[]} colsHTML
    * @private
    */
-  _columnsHTML () {
-    this.renderData.columnsHTMLArr = this.renderData.columnsDef.map((columnDef) => {
-      return '<th>' + (columnDef.th || defaultColumnRender)(columnDef) + '</th>'
-    }, '')
-    this.emit('beforeRenderColumns', this.renderData.columnsHTMLArr)
+  _renderCols (colsHTML) {
+    const { ui } = this
+    ui.$columnsColGroup.innerHTML = ui.$bodyColGroup.innerHTML = colsHTML.join('')
   }
 
   /**
-   * 计算出渲染 body 需要的数据
+   * 调整各种尺寸
+   * @param {Number[]} columnsWidth
    * @private
    */
-  _bodyHTML () {
-    this.renderData.trsArr = this.empty ? [] : this.rows.map((row, index) => {
-      let rowHTML = `<tr data-index="${index}">`
-      this.renderData.columnsDef.forEach(columnDef => {
-        rowHTML += '<td>' + (columnDef.td || defaultDataRender)(columnDef, row) + '</td>'
-      })
-      rowHTML += '</tr>'
-      return rowHTML
-    })
-  }
-
-  _renderColumns () {
-    this.ui.$columnsThead.innerHTML = this.renderData.columnsHTMLArr.join('')
-  }
-
-  _renderCols () {
-    this.ui.$columnsColGroup.innerHTML = this.ui.$bodyColGroup.innerHTML = this.renderData.colsHTMLArr.join('')
-  }
-
-  _renderBody () {
-    if (this.empty) {
-      this.ui.$body.classList.add('hidden')
-      this.ui.$noData.classList.remove('hidden')
-      return
-    }
-    this.ui.$bodyTbody.innerHTML = this.renderData.trsArr.join('')
-    this.ui.$body.classList.remove('hidden')
-    this.ui.$noData.classList.add('hidden')
-  }
-
-  _resize () {
-    const _totalWidth = this.renderData.columnsWidth ? this.renderData.columnsWidth.reduce((prev, width) => prev + width) : this.el.clientWidth
-    this.ui.$columns.style.width = _totalWidth + 'px' // 总长度需要先设定, 因为它会影响 columnsWrapper.clientHeight
+  _resize (columnsWidth) {
+    const { $columns, $bodyWrapper, $noData, $body } = this.ui
+    const _totalWidth = columnsWidth ? columnsWidth.reduce((prev, width) => prev + width) : this.el.clientWidth
+    $columns.style.width = _totalWidth + 'px' // 总长度需要先设定, 因为它会影响 columnsWrapper.clientHeight
     const totalHeight = this.options.height
     const columnsHeight = this.ui.$columnsWrapper.clientHeight
     const bodyHeight = totalHeight - columnsHeight
@@ -227,17 +174,109 @@ class DataGrid extends Event {
       bodyHeight
     }
     this.emit('beforeSetSize', obj)
-    this.ui.$bodyWrapper.style.height = obj.bodyHeight + 'px'
+    $bodyWrapper.style.height = obj.bodyHeight + 'px'
     if (this.empty) {
-      this.ui.$noData.style.height = obj.bodyHeight + 'px'
-      this.ui.$noData.style.lineHeight = obj.bodyHeight + 'px'
+      $noData.style.height = obj.bodyHeight + 'px'
+      $noData.style.lineHeight = obj.bodyHeight + 'px'
     } else {
-      this.ui.$body.style.width = _totalWidth + 'px'
+      $body.style.width = _totalWidth + 'px'
     }
   }
 
   /**
+   * 渲染表头的方法
+   * @param {String[]|Object[]} columns
+   * @private
+   */
+  setColumns (columns) {
+    const columnsDef = this.renderData.columnsDef = this._normalize(columns)
+    const columnsHTML = this._columnsHTML(columnsDef)
+    this.emit('beforeRenderColumns', columnsHTML)
+    this._renderColumns(columnsHTML)
+  }
+
+  /**
+   * 调整字段定义, 并根据字段定义计算出每个字段的宽度数组
+   * @param columns
+   * @private
+   */
+  _normalize (columns) {
+    return columns.map(columnDef => {
+      const _def = typeof columnDef === 'string'
+        ? { name: columnDef }
+        : columnDef
+
+      if (!_def.key) _def.key = _def.name
+      return _def
+    })
+  }
+
+  /**
+   * 计算出渲染表头字段的 HTML
+   * @private
+   */
+  _columnsHTML (columnsDef) {
+    return columnsDef.map(columnDef => {
+      return '<th>' + (columnDef.th || defaultColumnRender)(columnDef) + '</th>'
+    })
+  }
+
+  /**
+   * 渲染表头
+   * @param {String[]} columnsHTML
+   * @private
+   */
+  _renderColumns (columnsHTML) {
+    this.ui.$columnsThead.innerHTML = columnsHTML.join('')
+  }
+
+  /**
+   * 渲染表格的方法
+   * @param {Object[]} rows
+   */
+  setBody (rows) {
+    const { renderData } = this
+    this.empty = !rows || !rows.length
+    renderData.rows = rows
+    renderData.trsArr = this._bodyHTML(renderData.columnsDef, rows)
+    this._renderBody(renderData.trsArr)
+  }
+
+  /**
+   * 计算出渲染 body 需要的数据
+   * @private
+   */
+  _bodyHTML (columnsDef, rows) {
+    return this.empty ? [] : rows.map((row, index) => {
+      let rowHTML = `<tr data-index="${index}">`
+      columnsDef.forEach(columnDef => {
+        rowHTML += '<td>' + (columnDef.td || defaultDataRender)(columnDef, row) + '</td>'
+      })
+      rowHTML += '</tr>'
+      return rowHTML
+    })
+  }
+
+  /**
+   * 渲染数据
+   * @param {String[]} trsArr
+   * @private
+   */
+  _renderBody (trsArr) {
+    const { $body, $noData, $bodyTbody } = this.ui
+    if (this.empty) {
+      $body.classList.add('hidden')
+      $noData.classList.remove('hidden')
+      return
+    }
+    $bodyTbody.innerHTML = trsArr.join('')
+    $body.classList.remove('hidden')
+    $noData.classList.add('hidden')
+  }
+
+  /**
    * 选中表格中的某一行
+   * todo 使用插件提供此功能
    * @param index
    */
   selectRow (index) {
@@ -248,6 +287,17 @@ class DataGrid extends Event {
     tr.classList.add('selected')
     this._selectRowIndex = index
     this.emit('selectedChanged', index)
+  }
+
+  /**
+   * 销毁实例。
+   * @param {Boolean} remove - 如果为 true, 则会移除根节点
+   */
+  destroy (remove) {
+    this.emit('beforeDestroy')
+    this._unbindEvents.forEach(unbind => unbind())
+    if (remove) this.el.remove()
+    this.emit('afterDestroy')
   }
 }
 
