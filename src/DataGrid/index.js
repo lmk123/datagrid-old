@@ -58,15 +58,6 @@ class DataGrid extends Event {
     this._init()
   }
 
-  /**
-   * 重置各种状态
-   * @private
-   */
-  _reset () {
-    this._selectRowIndex = -1
-    this.renderData = {}
-  }
-
   _init () {
     const _unbindEvents = this._unbindEvents = []
     this.emit('beforeInit')
@@ -97,15 +88,6 @@ class DataGrid extends Event {
       })
     )
 
-    // 点击数据行时, 给出事件提示
-    // todo 使用插件提供此功能
-    ui.$body.addEventListener('click', e => {
-      const tr = findParent('tr', e.target, ui.$body)
-      if (!tr) return
-      const trIndex = Number(tr.dataset.index)
-      if (!Number.isNaN(trIndex) && this._selectRowIndex !== trIndex) this.selectRow(trIndex)
-    })
-
     this.ui = ui
     this.emit('afterInit')
   }
@@ -119,7 +101,7 @@ class DataGrid extends Event {
    */
   setData (data) {
     this.emit('beforeSetData', data)
-    this._reset()
+    this.renderData = {}
     this.setColumns(data.columns)
     this.setBody(data.rows)
     this.setWidth(data.width)
@@ -272,21 +254,6 @@ class DataGrid extends Event {
     $bodyTbody.innerHTML = trsArr.join('')
     $body.classList.remove('hidden')
     $noData.classList.add('hidden')
-  }
-
-  /**
-   * 选中表格中的某一行
-   * todo 使用插件提供此功能
-   * @param index
-   */
-  selectRow (index) {
-    const tr = this.ui.$body.querySelector(`tr[data-index="${index}"]`)
-    if (!tr) return
-    const selectedTR = this.ui.$body.querySelector('tr.selected')
-    if (selectedTR) selectedTR.classList.remove('selected')
-    tr.classList.add('selected')
-    this._selectRowIndex = index
-    this.emit('selectedChanged', index)
   }
 
   /**
