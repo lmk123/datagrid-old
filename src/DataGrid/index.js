@@ -1,7 +1,6 @@
 import './index.scss'
 import containerTemplate from './template.html'
 import Event from '../utils/Event'
-import findParent from '../utils/findParent'
 import addEvent from '../utils/addEvent'
 
 function defaultColumnRender (columnDef) {

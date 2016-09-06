@@ -1,3 +1,4 @@
+import './index.scss'
 import findParent from '../../utils/findParent'
 
 export default function (DataGrid) {

@@ -17,8 +17,8 @@ export default function (DataGrid) {
 
     const unbindEvents = []
 
-    // 使用一个对象保存每个字段当前的排序状态
-    let state = {}
+    let lastSortColumnIndex
+    let sortType = NONE_ORDER
 
     unbindEvents.push(
       // 给每个字段内部注入小箭头
@@ -28,6 +28,13 @@ export default function (DataGrid) {
         })
       })
     )
+
+    function clearLastSort () {
+      if (typeof lastSortColumnIndex === 'number') {
+        const lastTH = datagrid.ui.$columnsWrapper.querySelector(`th:nth-child(${lastSortColumnIndex + 1})`)
+        if (lastTH) lastTH.classList.remove(CLASS_ASC, CLASS_DESC)
+      }
+    }
 
     datagrid.once('afterInit', () => {
       // 监听字段的点击事件
@@ -40,25 +47,29 @@ export default function (DataGrid) {
           const index = indexOf.call(th.parentElement.children, th)
           const columnDef = datagrid.renderData.columnsDef[index]
           if (columnDef.sortable === false) return
-          forEach.call($columnsWrapper.querySelectorAll(`.${CLASS_DESC}, .${CLASS_ASC}`), th => {
-            th.classList.remove(CLASS_ASC, CLASS_DESC)
-          })
-          const order = state[index] || NONE_ORDER
-          state = {}
-          switch (order) {
+
+          if (index !== lastSortColumnIndex) {
+            clearLastSort()
+            lastSortColumnIndex = index
+            sortType = NONE_ORDER
+          }
+
+          th.classList.remove(CLASS_ASC, CLASS_DESC)
+
+          switch (sortType) {
             case NONE_ORDER:
-              state[index] = ASC
+              sortType = ASC
               th.classList.add(CLASS_ASC)
               break
             case ASC:
-              state[index] = DESC
+              sortType = DESC
               th.classList.add(CLASS_DESC)
               break
             case DESC:
-              state[index] = NONE_ORDER
+              sortType = NONE_ORDER
               break
           }
-          datagrid.emit('sort', columnDef, state[index], th)
+          datagrid.emit('sort', columnDef, sortType, th)
         })
       )
     })
