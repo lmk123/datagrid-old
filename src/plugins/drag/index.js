@@ -91,7 +91,7 @@ export default function (DataGrid) {
       })
     )
 
-    datagrid.once('beforeDestroy', ()=> {
+    datagrid.once('beforeDestroy', () => {
       unbindEvents.forEach(unbind => unbind())
     })
   })

@@ -14,7 +14,7 @@ export default function (DataGrid) {
   }
 
   DataGrid.hook(datagrid => {
-    const unbind = datagrid.on('beforeSetData', ()=> {
+    const unbind = datagrid.on('beforeSetData', () => {
       datagrid._selectRowIndex = null
     })
 

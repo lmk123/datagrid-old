@@ -88,12 +88,8 @@ export default function (DataGrid) {
       datagrid.el.appendChild(wrapper)
       datagrid.ui.$pagerWrapper = wrapper
     })
-    datagrid.once('beforeDestroy', ()=> {
+    datagrid.once('beforeDestroy', () => {
       unbindEvents.forEach(unbind => unbind())
     })
   })
 }
-
-
-
-

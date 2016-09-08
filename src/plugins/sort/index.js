@@ -2,7 +2,7 @@ import './index.scss'
 import findParent from '../../utils/findParent'
 import addEvent from '../../utils/addEvent'
 
-const { indexOf, forEach } = Array.prototype
+const { indexOf } = Array.prototype
 
 const DESC = -1 // 降序
 const ASC = 1 // 升序
@@ -74,10 +74,8 @@ export default function (DataGrid) {
       )
     })
 
-    datagrid.once('beforeDestroy', ()=> {
+    datagrid.once('beforeDestroy', () => {
       unbindEvents.forEach(unbind => unbind())
     })
   })
 }
-
-
