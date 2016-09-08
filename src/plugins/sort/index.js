@@ -13,7 +13,7 @@ const CLASS_DESC = 'order-by-desc'
 
 export default function (DataGrid) {
   DataGrid.hook(datagrid => {
-    if (!datagrid.options.sortable) return
+    if (!datagrid.options.columnSorting) return
 
     const unbindEvents = []
 

@@ -4,6 +4,8 @@ import addEvent from '../../utils/addEvent'
 
 export default function (DataGrid) {
   DataGrid.hook(function (datagrid) {
+    if (!datagrid.options.pagination) return
+
     function jumpTo (pageNo) {
       if (Number.isNaN(pageNo) || pageNo < 1 || pageNo > pager.totalPage) {
         wrapper.querySelector('[data-page]').value = pager.cur

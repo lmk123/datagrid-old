@@ -1,7 +1,10 @@
 import DataGrid from '../src/index'
 
 const grid = new DataGrid(document.querySelector('div'), {
-  sortable: true
+  columnSorting: true,
+  columnResize: true,
+  pagination: true,
+  selection: true
 })
 
 window.$grid = grid

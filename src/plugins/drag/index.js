@@ -13,6 +13,8 @@ const MOUSEUP = IS_TOUCH ? 'touchend' : 'mouseup'
 
 export default function (DataGrid) {
   DataGrid.hook(datagrid => {
+    if (!datagrid.options.columnResize) return
+
     // 拖动时显示的虚线
     const dragLine = document.createElement('div')
     dragLine.classList.add('dragging-line')
