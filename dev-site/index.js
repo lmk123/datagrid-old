@@ -4,7 +4,8 @@ const grid = new DataGrid(document.querySelector('div'), {
   columnSorting: true,
   columnResize: true,
   pagination: true,
-  selection: true
+  selection: true,
+  fixedColumns: true
 })
 
 window.$grid = grid
@@ -33,57 +34,25 @@ grid.on('sort', (column, dir, th) => {
 // 测试设置空数据
 grid.setData({
   columns: [
-    { name: '日期', type: '常规', fixed: false },
-    { name: '总计', type: '常规', fixed: false },
-    { name: '催单(用户)', type: '用户', fixed: false },
-    {
-      name: '退单(用户)',
-      type: '用户',
-      fixed: false
-    },
-    { name: '订单变更(用户)', type: '用户', fixed: false },
-    {
-      name: '钱款问题(用户)',
-      type: '用户',
-      fixed: false
-    },
-    { name: '订单投诉(用户)', type: '用户', fixed: false },
-    {
-      name: '软件、账户、会员卡(用户)',
-      type: '用户',
-      fixed: false
-    },
-    { name: '账户与资金(商家)', type: '商家', fixed: false },
-    {
-      name: '手淘及支付宝店铺(商家)',
-      type: '商家',
-      fixed: false
-    },
-    { name: '物流配送(商家)', type: '商家', fixed: false },
-    {
-      name: '商家客户端(商家)',
-      type: '商家',
-      fixed: false
-    },
-    { name: '开店与合作(商家)', type: '商家', fixed: false },
-    {
-      name: '订单查询(商家)',
-      type: '商家',
-      fixed: false
-    },
-    { name: '加入蜂鸟(蜂鸟)', type: '蜂鸟', fixed: false },
-    {
-      name: '账户管理(蜂鸟)',
-      type: '蜂鸟',
-      fixed: false
-    },
-    { name: '骑手申诉(蜂鸟)', type: '蜂鸟', fixed: false },
-    {
-      name: '投诉及撤销(蜂鸟)',
-      type: '蜂鸟',
-      fixed: false
-    },
-    { name: '其他咨询(蜂鸟)', type: '蜂鸟', fixed: false }
+    '日期',
+    '总计',
+    '催单(用户)',
+    '退单(用户)',
+    '订单变更(用户)',
+    '钱款问题(用户)',
+    '订单投诉(用户)',
+    '软件、账户、会员卡(用户)',
+    '账户与资金(商家)',
+    '手淘及支付宝店铺(商家)',
+    '物流配送(商家)',
+    '商家客户端(商家)',
+    '开店与合作(商家)',
+    '订单查询(商家)',
+    '加入蜂鸟(蜂鸟)',
+    '账户管理(蜂鸟)',
+    '骑手申诉(蜂鸟)',
+    '投诉及撤销(蜂鸟)',
+    '其他咨询(蜂鸟)'
   ],
   rows: null,
   size: 30,
@@ -93,57 +62,25 @@ grid.setData({
 // 测试设置数据
 grid.setData({
   columns: [
-    { name: '日期', type: '常规', fixed: false },
-    { name: '总计', type: '常规', fixed: false },
-    { name: '催单(用户)', type: '用户', fixed: false },
-    {
-      name: '退单(用户)',
-      type: '用户',
-      fixed: false
-    },
-    { name: '订单变更(用户)', type: '用户', fixed: false },
-    {
-      name: '钱款问题(用户)',
-      type: '用户',
-      fixed: false
-    },
-    { name: '订单投诉(用户)', type: '用户', fixed: false },
-    {
-      name: '软件、账户、会员卡(用户)',
-      type: '用户',
-      fixed: false
-    },
-    { name: '账户与资金(商家)', type: '商家', fixed: false },
-    {
-      name: '手淘及支付宝店铺(商家)',
-      type: '商家',
-      fixed: false
-    },
-    { name: '物流配送(商家)', type: '商家', fixed: false },
-    {
-      name: '商家客户端(商家)',
-      type: '商家',
-      fixed: false
-    },
-    { name: '开店与合作(商家)', type: '商家', fixed: false },
-    {
-      name: '订单查询(商家)',
-      type: '商家',
-      fixed: false
-    },
-    { name: '加入蜂鸟(蜂鸟)', type: '蜂鸟', fixed: false },
-    {
-      name: '账户管理(蜂鸟)',
-      type: '蜂鸟',
-      fixed: false
-    },
-    { name: '骑手申诉(蜂鸟)', type: '蜂鸟', fixed: false },
-    {
-      name: '投诉及撤销(蜂鸟)',
-      type: '蜂鸟',
-      fixed: false
-    },
-    { name: '其他咨询(蜂鸟)', type: '蜂鸟', fixed: false }
+    '日期',
+    '总计',
+    '催单(用户)',
+    '退单(用户)',
+    '订单变更(用户)',
+    '钱款问题(用户)',
+    '订单投诉(用户)',
+    '软件、账户、会员卡(用户)',
+    '账户与资金(商家)',
+    '手淘及支付宝店铺(商家)',
+    '物流配送(商家)',
+    '商家客户端(商家)',
+    '开店与合作(商家)',
+    '订单查询(商家)',
+    '加入蜂鸟(蜂鸟)',
+    '账户管理(蜂鸟)',
+    '骑手申诉(蜂鸟)',
+    '投诉及撤销(蜂鸟)',
+    '其他咨询(蜂鸟)'
   ],
   rows: [
     {
@@ -484,6 +421,7 @@ grid.setData({
     }
   ],
   width: [100, 100, 100, 100, 130, 130, 130, 220, 140, 200, 130, 160, 160, 200, 200, 100, 100, 100, 100],
+  fixedColumnsLeft: 3,
   size: 30,
   total: 109
 })

@@ -2,7 +2,7 @@ import './index.scss'
 import findParent from '../../utils/findParent'
 
 export default function (DataGrid) {
-  DataGrid.prototype.selectRow = function (index) {
+  DataGrid.prototype.selectRow = function (index, fire = true) {
     const { $body } = this.ui
     const tr = $body.querySelector(`tr[data-index="${index}"]`)
     if (!tr) return
@@ -10,7 +10,7 @@ export default function (DataGrid) {
     if (selectedTR) selectedTR.classList.remove('selected')
     tr.classList.add('selected')
     this._selectRowIndex = index
-    this.emit('selectedChanged', index)
+    if (fire) this.emit('selectedChanged', index)
   }
 
   DataGrid.hook(datagrid => {

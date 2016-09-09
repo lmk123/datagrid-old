@@ -104,7 +104,7 @@ class DataGrid extends Event {
     this.setColumns(data.columns)
     this.setBody(data.rows)
     this.setWidth(data.width)
-    this.emit('afterSetData')
+    this.emit('afterSetData', data)
   }
 
   setWidth (widthArr) {
