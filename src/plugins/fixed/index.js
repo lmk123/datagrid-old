@@ -40,9 +40,34 @@ module.exports = function (DataGrid) {
         selection: datagrid.options.selection
       })
 
+      // 修改一个元素的 scrollTop 属性值会触发这个元素的 onscroll 事件，
+      // 为了避免两个 datagrid 相互之间循环触发 onscroll 事件，
+      // 所以加了下面的一堆标识位。
+      // 循环触发 onscroll 事件会导致在快速滑动时两个表格的 scrollTop 不同步，
+      // 造成"撕裂"现象
+      var dataGridBodyScrolling = false
+      var dataGridBodyScrollingTimeId
+      var fixedDataGridBodyScrolling = false
+      var fixedDataGridBodyScrollingTimeId
       unbindEvents.push(
-        addEvent(fixedDataGrid.ui.$bodyWrapper, 'scroll', syncScrollTop),
-        addEvent(datagrid.ui.$bodyWrapper, 'scroll', syncScrollTop)
+        addEvent(datagrid.ui.$bodyWrapper, 'scroll', function () {
+          if (fixedDataGridBodyScrolling) return
+          dataGridBodyScrolling = true
+          dataGridBodyScrollingTimeId && clearTimeout(dataGridBodyScrollingTimeId)
+          dataGridBodyScrollingTimeId = setTimeout(function () {
+            dataGridBodyScrolling = false
+          }, 250)
+          fixedDataGrid.ui.$bodyWrapper.scrollTop = this.scrollTop
+        }),
+        addEvent(fixedDataGrid.ui.$bodyWrapper, 'scroll', function () {
+          if (dataGridBodyScrolling) return
+          fixedDataGridBodyScrolling = true
+          fixedDataGridBodyScrollingTimeId && clearTimeout(fixedDataGridBodyScrollingTimeId)
+          fixedDataGridBodyScrollingTimeId = setTimeout(function () {
+            fixedDataGridBodyScrolling = false
+          }, 250)
+          datagrid.ui.$bodyWrapper.scrollTop = this.scrollTop
+        })
       )
 
       if (datagrid.options.selection) {
@@ -52,17 +77,6 @@ module.exports = function (DataGrid) {
         fixedDataGrid.on('selectedChanged', function (index) {
           datagrid.selectRow(index)
         })
-      }
-
-      /**
-       * 同步固定表格和主表格的 body 滚动位置
-       * @param e
-       */
-      function syncScrollTop (e) {
-        var isInFixed = fixedDataGrid.el.contains(e.target)
-        var needAdjustBody = (isInFixed ? datagrid : fixedDataGrid).ui.$bodyWrapper
-        var fromBody = (isInFixed ? fixedDataGrid : datagrid).ui.$bodyWrapper
-        needAdjustBody.scrollTop = fromBody.scrollTop
       }
     }
   })

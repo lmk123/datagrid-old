@@ -10,5 +10,9 @@
     .grid-body-wrapper {
       border-right: none;
     }
+
+    .grid-body-wrapper::-webkit-scrollbar {
+      display: none;
+    }
   }
 }
