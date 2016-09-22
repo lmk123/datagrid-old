@@ -1,29 +1,29 @@
-import './index.scss'
-import findParent from '../../utils/findParent'
-import addEvent from '../../utils/addEvent'
+require('./index.scss')
+var findParent = require('../../utils/findParent')
+var addEvent = require('../../utils/addEvent')
 
-const { indexOf } = Array.prototype
+var indexOf = Array.prototype.indexOf
 
-const DESC = -1 // 降序
-const ASC = 1 // 升序
-const NONE_ORDER = 0 // 不排序
+var DESC = -1 // 降序
+var ASC = 1 // 升序
+var NONE_ORDER = 0 // 不排序
 
-const CLASS_ASC = 'order-by-asc'
-const CLASS_DESC = 'order-by-desc'
+var CLASS_ASC = 'order-by-asc'
+var CLASS_DESC = 'order-by-desc'
 
-export default function (DataGrid) {
-  DataGrid.hook(datagrid => {
+module.exports = function (DataGrid) {
+  DataGrid.hook(function (datagrid) {
     if (!datagrid.options.columnSorting) return
 
-    const unbindEvents = []
+    var unbindEvents = []
 
-    let lastSortColumnIndex
-    let sortType = NONE_ORDER
+    var lastSortColumnIndex
+    var sortType = NONE_ORDER
 
     unbindEvents.push(
       // 给每个字段内部注入小箭头
-      datagrid.on('beforeRenderColumns', columnsHTMLArr => {
-        columnsHTMLArr.forEach((html, index) => {
+      datagrid.on('beforeRenderColumns', function (columnsHTMLArr) {
+        columnsHTMLArr.forEach(function (html, index) {
           columnsHTMLArr[index] = html.replace('</th>', '<span class="order-ico"></span></th>')
         })
       })
@@ -31,21 +31,21 @@ export default function (DataGrid) {
 
     function clearLastSort () {
       if (typeof lastSortColumnIndex === 'number') {
-        const lastTH = datagrid.ui.$columnsWrapper.querySelector(`th:nth-child(${lastSortColumnIndex + 1})`)
+        var lastTH = datagrid.ui.$columnsWrapper.querySelector('th:nth-child(' + (lastSortColumnIndex + 1) + ')')
         if (lastTH) lastTH.classList.remove(CLASS_ASC, CLASS_DESC)
       }
     }
 
-    datagrid.once('afterInit', () => {
+    datagrid.once('afterInit', function () {
       // 监听字段的点击事件
-      const { $columnsWrapper } = datagrid.ui
+      var $columnsWrapper = datagrid.ui.$columnsWrapper
       unbindEvents.push(
-        addEvent($columnsWrapper, 'click', e => {
-          const th = findParent('th', e.target, $columnsWrapper)
+        addEvent($columnsWrapper, 'click', function (e) {
+          var th = findParent('th', e.target, $columnsWrapper)
           if (!th) return
           if (th.classList.contains('resizing')) return
-          const index = indexOf.call(th.parentElement.children, th)
-          const columnDef = datagrid.renderData.columnsDef[index]
+          var index = indexOf.call(th.parentElement.children, th)
+          var columnDef = datagrid.renderData.columnsDef[index]
           if (columnDef.sortable === false) return
 
           if (index !== lastSortColumnIndex) {
@@ -74,8 +74,8 @@ export default function (DataGrid) {
       )
     })
 
-    datagrid.once('beforeDestroy', () => {
-      unbindEvents.forEach(unbind => unbind())
+    datagrid.once('beforeDestroy', function () {
+      unbindEvents.forEach(function (unbind) { unbind() })
     })
   })
 }

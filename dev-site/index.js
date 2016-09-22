@@ -1,6 +1,6 @@
-import DataGrid from '../src/index'
+var DataGrid = require('../src/index')
 
-const grid = new DataGrid(document.querySelector('div'), {
+var grid = new DataGrid(document.querySelector('div'), {
   columnSorting: true,
   columnResize: true,
   pagination: true,
@@ -10,22 +10,22 @@ const grid = new DataGrid(document.querySelector('div'), {
 
 window.$grid = grid
 
-grid.on('beforeRenderBody', arr => {
+grid.on('beforeRenderBody', function (arr) {
   arr.push('<tr><td>添加自定义的 HTML 片段</td></tr>')
 })
 
 // 测试 tr 点击事件
-grid.on('selectedChanged', index => {
+grid.on('selectedChanged', function (index) {
   console.log('点击了第几行的数据', index)
 })
 
 // 测试切换 page 事件
-grid.on('switchPage', no => {
+grid.on('switchPage', function (no) {
   console.log('翻页事件:', no)
 })
 
 // 测试排序事件
-grid.on('sort', (column, dir, th) => {
+grid.on('sort', function (column, dir, th) {
   console.log('排序事件, 要排序的字段是:', column)
   console.log('排序事件, 要排序的方向是:', dir, '。大于0表示升序,小于0表示降序,等于0表示不排序')
   console.log('排序事件, 被排序的 th 元素是:', th)
@@ -62,6 +62,13 @@ grid.setData({
 // 测试设置数据
 grid.setData({
   columns: [
+    {
+      name: '对比',
+      _a: 'x',
+      td: function (columnDef, row, index) {
+        return '<input type="checkbox">'
+      }
+    },
     '日期',
     '总计',
     '催单(用户)',
@@ -420,7 +427,7 @@ grid.setData({
       '其他咨询(蜂鸟)': '1,557'
     }
   ],
-  width: [100, 100, 100, 100, 130, 130, 130, 220, 140, 200, 130, 160, 160, 200, 200, 100, 100, 100, 100],
+  width: [100, 100, 100, 100, 100, 130, 130, 130, 220, 140, 200, 130, 160, 160, 200, 200, 100, 100, 100, 100],
   fixedColumnsLeft: 3,
   size: 30,
   total: 109

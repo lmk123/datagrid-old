@@ -21,4 +21,3 @@ baseConfig.plugins.push(
 )
 
 module.exports = baseConfig
-

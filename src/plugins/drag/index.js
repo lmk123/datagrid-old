@@ -1,50 +1,50 @@
-import './index.scss'
-import addEvent from '../../utils/addEvent'
-import findParent from '../../utils/findParent'
+require('./index.scss')
+var addEvent = require('../../utils/addEvent')
+var findParent = require('../../utils/findParent')
 
-const MIN_WIDTH = 100 // 表格的最小宽度
+var MIN_WIDTH = 100 // 表格的最小宽度
 
-const { indexOf } = Array.prototype
+var indexOf = Array.prototype.indexOf
 
-const IS_TOUCH = 'ontouchstart' in window
-const MOUSEDOWN = IS_TOUCH ? 'touchstart' : 'mousedown'
-const MOUSEMOVE = IS_TOUCH ? 'touchmove' : 'mousemove'
-const MOUSEUP = IS_TOUCH ? 'touchend' : 'mouseup'
+var IS_TOUCH = 'ontouchstart' in window
+var MOUSEDOWN = IS_TOUCH ? 'touchstart' : 'mousedown'
+var MOUSEMOVE = IS_TOUCH ? 'touchmove' : 'mousemove'
+var MOUSEUP = IS_TOUCH ? 'touchend' : 'mouseup'
 
-export default function (DataGrid) {
-  DataGrid.hook(datagrid => {
+module.exports = function (DataGrid) {
+  DataGrid.hook(function (datagrid) {
     if (!datagrid.options.columnResize) return
 
     // 拖动时显示的虚线
-    const dragLine = document.createElement('div')
+    var dragLine = document.createElement('div')
     dragLine.classList.add('dragging-line')
 
-    const unbindEvents = []
+    var unbindEvents = []
 
     // 注入虚线
-    datagrid.once('afterInit', () => {
+    datagrid.once('afterInit', function () {
       datagrid.ui.$draggingLine = dragLine
       datagrid.el.appendChild(dragLine)
     })
 
-    let dragging = false // 是否正在拖动中
-    let draggingLever // 被拖动的那个小方块
-    let draggingTH // 被拖动的 th 元素
-    let draggingColumnIndex // 被拖动的元素是第几个字段
-    let startX // 拖动开始时的 pageX 值
-    let draggingLineInitLeft // 拖动开始时虚线的左编剧
-    let minLeft // 当往左边拖动时能拖动的最大距离
+    var dragging = false // 是否正在拖动中
+    var draggingLever // 被拖动的那个小方块
+    var draggingTH // 被拖动的 th 元素
+    var draggingColumnIndex // 被拖动的元素是第几个字段
+    var startX // 拖动开始时的 pageX 值
+    var draggingLineInitLeft // 拖动开始时虚线的左编剧
+    var minLeft // 当往左边拖动时能拖动的最大距离
 
     unbindEvents.push(
       // 注入供用户拖拽的小方块
-      datagrid.on('beforeRenderColumns', columnsHTMLArr => {
-        columnsHTMLArr.forEach((html, index) => {
+      datagrid.on('beforeRenderColumns', function (columnsHTMLArr) {
+        columnsHTMLArr.forEach(function (html, index) {
           columnsHTMLArr[index] = html.replace('</th>', '<span class="drag-lever"></span></th>')
         })
       }),
-      addEvent(datagrid.el, MOUSEDOWN, e => {
+      addEvent(datagrid.el, MOUSEDOWN, function (e) {
         if (e.target.classList.contains('drag-lever') && e.button === 0) {
-          const th = findParent('th', e.target, datagrid.el)
+          var th = findParent('th', e.target, datagrid.el)
           if (!th) return
 
           // 给 th 加一个状态, 避免触发排序功能
@@ -54,7 +54,9 @@ export default function (DataGrid) {
 
           minLeft = -(th.clientWidth - MIN_WIDTH)
 
-          const { $columnsWrapper, $bodyWrapper } = datagrid.ui
+          var ui = datagrid.ui
+          var $columnsWrapper = ui.$columnsWrapper
+          var $bodyWrapper = ui.$bodyWrapper
 
           // 显示虚线
           dragLine.style.height = $columnsWrapper.clientHeight + $bodyWrapper.clientHeight + 'px'
@@ -69,32 +71,32 @@ export default function (DataGrid) {
           draggingColumnIndex = indexOf.call(th.parentElement.children, th)
         }
       }),
-      addEvent(document, MOUSEMOVE, e => {
+      addEvent(document, MOUSEMOVE, function (e) {
         if (!dragging) return
         e.preventDefault() // 阻止在 PC 端拖动鼠标时选中文字或在移动端滑动屏幕
         // 调整虚线的 left 值
-        const moved = e.pageX - startX
+        var moved = e.pageX - startX
         if (moved > minLeft) {
           dragLine.style.left = draggingLineInitLeft + (e.pageX - startX) + 'px'
         }
       }),
-      addEvent(document, MOUSEUP, e => {
+      addEvent(document, MOUSEUP, function (e) {
         if (!dragging) return
         // 等 ../sort/index.js 里的 click 事件处理完后再移除这个 CSS 类
-        setTimeout(() => draggingTH.classList.remove('resizing'), 0)
+        setTimeout(function () { draggingTH.classList.remove('resizing') }, 0)
         dragLine.classList.remove('show')
         dragging = false
         draggingLever.classList.remove('dragging')
-        let moved = e.pageX - startX // 计算移动的距离
+        var moved = e.pageX - startX // 计算移动的距离
         if (moved < minLeft) moved = minLeft
-        const { columnsWidth } = datagrid.renderData
+        var columnsWidth = datagrid.renderData.columnsWidth
         columnsWidth[draggingColumnIndex] = columnsWidth[draggingColumnIndex] + moved
         datagrid.setWidth(columnsWidth)
       })
     )
 
-    datagrid.once('beforeDestroy', () => {
-      unbindEvents.forEach(unbind => unbind())
+    datagrid.once('beforeDestroy', function () {
+      unbindEvents.forEach(function (unbind) { unbind() })
     })
   })
 }

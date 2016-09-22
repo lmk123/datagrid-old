@@ -6,9 +6,9 @@
  * @param {Boolean} [useCapture]
  * @return {function()}
  */
-export default function (element, eventName, handler, useCapture = false) {
+module.exports = function (element, eventName, handler, useCapture) {
   element.addEventListener(eventName, handler, useCapture)
-  return () => {
+  return function () {
     element.removeEventListener(eventName, handler, useCapture)
   }
 }

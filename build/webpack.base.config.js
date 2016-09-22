@@ -1,21 +1,13 @@
 const ExtractTextPlugin = require('extract-text-webpack-plugin')
-const path = require('path')
 
 module.exports = {
   output: {
     path: './dist',
-    library: 'datagrid',
+    library: 'Datagrid',
     libraryTarget: 'umd'
   },
   module: {
     loaders: [
-      {
-        test: /\.js$/,
-        include: [
-          path.resolve(__dirname, '../src')
-        ],
-        loader: 'babel-loader'
-      },
       {
         test: /\.(woff2?|ttf|png|svg|eot)$/,
         loader: 'file-loader',

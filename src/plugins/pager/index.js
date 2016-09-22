@@ -1,8 +1,8 @@
-import './index.scss'
-import pagerTemplate from './template.html'
-import addEvent from '../../utils/addEvent'
+require('./index.scss')
+var pagerTemplate = require('./template.html')
+var addEvent = require('../../utils/addEvent')
 
-export default function (DataGrid) {
+module.exports = function (DataGrid) {
   DataGrid.hook(function (datagrid) {
     if (!datagrid.options.pagination) return
 
@@ -15,7 +15,7 @@ export default function (DataGrid) {
       datagrid.emit('switchPage', pageNo)
     }
 
-    const pager = datagrid.pager = {
+    var pager = datagrid.pager = {
       cur: 1, // 当前页数
       total: null, // 总共有多少条记录
       size: null, // 每一页有多少条记录
@@ -24,16 +24,16 @@ export default function (DataGrid) {
       totalPage: null // 一共有多少页
     }
 
-    const unbindEvents = []
+    var unbindEvents = []
 
-    const wrapper = document.createElement('div')
+    var wrapper = document.createElement('div')
     wrapper.classList.add('grid-pager-wrapper')
 
     unbindEvents.push(
-      addEvent(wrapper, 'click', e => {
-        const { jump } = e.target.dataset
+      addEvent(wrapper, 'click', function (e) {
+        var jump = e.target.dataset.jump
         if (!jump) return
-        let pageTo
+        var pageTo
         switch (jump) {
           case 'first':
             pageTo = 1
@@ -50,23 +50,24 @@ export default function (DataGrid) {
         }
         jumpTo(pageTo)
       }),
-      addEvent(wrapper, 'click', e => {
+      addEvent(wrapper, 'click', function (e) {
         if (e.target.dataset.downlond === undefined) return
         datagrid.emit('download-table')
       }),
-      addEvent(wrapper, 'keydown', e => {
+      addEvent(wrapper, 'keydown', function (e) {
         if (e.keyCode !== 13) return
         if (e.target.dataset.page === undefined) return
         jumpTo(Number(e.target.value))
       }),
-      datagrid.on('beforeSetData', data => {
+      datagrid.on('beforeSetData', function (data) {
         if (!data.rows || !data.rows.length) {
           wrapper.classList.add('hidden')
           return
         }
-        const { size, total } = data
-        const { cur } = pager
-        const dataLength = data.rows.length
+        var size = data.size
+        var total = data.total
+        var cur = pager.cur
+        var dataLength = data.rows.length
         pager.total = total
         pager.size = size
 
@@ -75,23 +76,23 @@ export default function (DataGrid) {
         pager.total = total
         pager.totalPage = Math.ceil(total / size)
 
-        wrapper.innerHTML = pagerTemplate.replace(/\{\{(\w+)\}\}/g, (word, group) => {
+        wrapper.innerHTML = pagerTemplate.replace(/\{\{(\w+)\}\}/g, function (word, group) {
           return pager[group]
         })
         wrapper.classList.remove('hidden')
       }),
-      datagrid.on('beforeSetSize', heightObj => {
-        const wrapperHeight = wrapper.clientHeight
+      datagrid.on('beforeSetSize', function (heightObj) {
+        var wrapperHeight = wrapper.clientHeight
         heightObj.pagerHeight = wrapperHeight
         heightObj.bodyHeight = heightObj.bodyHeight - wrapperHeight
       })
     )
-    datagrid.once('afterInit', () => {
+    datagrid.once('afterInit', function () {
       datagrid.el.appendChild(wrapper)
       datagrid.ui.$pagerWrapper = wrapper
     })
-    datagrid.once('beforeDestroy', () => {
-      unbindEvents.forEach(unbind => unbind())
+    datagrid.once('beforeDestroy', function () {
+      unbindEvents.forEach(function (unbind) { unbind() })
     })
   })
 }

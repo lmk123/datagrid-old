@@ -5,10 +5,11 @@
  * @param {HTMLElement} [stop] - 碰到这个元素时停止查找
  * @return {null|HTMLElement}
  */
-export default function (tagName, node, stop = document.body) {
-  const tag = tagName.toUpperCase()
-  let parent = node
-  let tr = null
+module.exports = function (tagName, node, stop) {
+  if (!stop) stop = document.body
+  var tag = tagName.toUpperCase()
+  var parent = node
+  var tr = null
   do {
     if (parent.tagName === tag) {
       tr = parent

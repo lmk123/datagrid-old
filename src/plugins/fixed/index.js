@@ -1,16 +1,16 @@
-import './index.scss'
-import addEvent from '../../utils/addEvent'
+require('./index.scss')
+var addEvent = require('../../utils/addEvent')
 
-export default function (DataGrid) {
-  DataGrid.hook(datagrid => {
+module.exports = function (DataGrid) {
+  DataGrid.hook(function (datagrid) {
     if (!datagrid.options.fixedColumns) return
 
-    const unbindEvents = []
+    var unbindEvents = []
 
-    let fixedDataGrid
+    var fixedDataGrid
 
-    datagrid.on('afterSetData', data => {
-      const { fixedColumnsLeft } = data
+    datagrid.on('afterSetData', function (data) {
+      var fixedColumnsLeft = data.fixedColumnsLeft
       if (!fixedColumnsLeft) {
         if (fixedDataGrid) fixedDataGrid.el.classList.add('hidden')
         return
@@ -25,10 +25,10 @@ export default function (DataGrid) {
     })
 
     function initFixedDataGrid () {
-      const datagridContainer = document.createElement('div')
+      var datagridContainer = document.createElement('div')
       datagridContainer.classList.add('fixed-datagrid')
 
-      const div = document.createElement('div')
+      var div = document.createElement('div')
       div.classList.add('hidden')
       datagridContainer.appendChild(div)
 
@@ -46,10 +46,10 @@ export default function (DataGrid) {
       )
 
       if (datagrid.options.selection) {
-        datagrid.on('selectedChanged', index => {
+        datagrid.on('selectedChanged', function (index) {
           fixedDataGrid.selectRow(index, false)
         })
-        fixedDataGrid.on('selectedChanged', index => {
+        fixedDataGrid.on('selectedChanged', function (index) {
           datagrid.selectRow(index)
         })
       }
@@ -59,9 +59,9 @@ export default function (DataGrid) {
        * @param e
        */
       function syncScrollTop (e) {
-        const isInFixed = fixedDataGrid.el.contains(e.target)
-        const needAdjustBody = (isInFixed ? datagrid : fixedDataGrid).ui.$bodyWrapper
-        const fromBody = (isInFixed ? fixedDataGrid : datagrid).ui.$bodyWrapper
+        var isInFixed = fixedDataGrid.el.contains(e.target)
+        var needAdjustBody = (isInFixed ? datagrid : fixedDataGrid).ui.$bodyWrapper
+        var fromBody = (isInFixed ? fixedDataGrid : datagrid).ui.$bodyWrapper
         needAdjustBody.scrollTop = fromBody.scrollTop
       }
     }
