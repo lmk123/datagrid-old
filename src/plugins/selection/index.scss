@@ -1,8 +1,8 @@
 @charset "utf-8";
 
 .datagrid {
-  tr.selected {
-    background: #000;
+  .grid-body-wrapper tr.selected {
+    background-color: #19d4ae;
     color: #fff;
   }
 }

@@ -64,7 +64,13 @@
     border-top: none;
   }
 
-  .grid-body-wrapper tbody tr:nth-child(2n) {
-    background-color: #f8f8f8;
+  .grid-body-wrapper tr {
+    &:nth-child(2n) {
+      background-color: #f8f8f8;
+    }
+
+    &:hover, &.hover {
+      background-color: #f3f3f3;
+    }
   }
 }
