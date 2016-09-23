@@ -2,6 +2,7 @@ require('./index.scss')
 var containerTemplate = require('./template.html')
 var Event = require('../utils/Event')
 var addEvent = require('../utils/addEvent')
+var extend = require('../utils/extend')
 
 function defaultColumnRender (columnDef) {
   return columnDef.name
@@ -21,7 +22,7 @@ var hooks = []
 function DataGrid (ele, options) {
   Event.call(this)
   this.el = ele
-  this.options = Object.assign({}, {
+  this.options = extend({}, {
     height: ele.clientHeight // 表格的总高度
   }, options)
   hooks.forEach(function (fn) { fn(this) }, this)

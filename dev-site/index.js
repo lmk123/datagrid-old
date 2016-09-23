@@ -65,6 +65,7 @@ grid.setData({
     {
       name: '对比',
       _a: 'x',
+      sortable: false,
       th: function () {
         return '<input type="checkbox">对比'
       },
