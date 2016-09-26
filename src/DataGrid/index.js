@@ -3,6 +3,7 @@ var containerTemplate = require('./template.html')
 var Event = require('../utils/Event')
 var addEvent = require('../utils/addEvent')
 var extend = require('../utils/extend')
+var findParent = require('../utils/findParent')
 
 function defaultColumnRender (columnDef) {
   return columnDef.name
@@ -83,15 +84,45 @@ dp._init = function () {
     ui[key] = el.querySelector(ui[key])
   }
 
+  var that = this
   _unbindEvents.push(
     // body 横向滚动时, 也要调整 columns 的左边距
     addEvent(ui.$bodyWrapper, 'scroll', function () {
       ui.$columns.style.left = '-' + ui.$bodyWrapper.scrollLeft + 'px'
+    }),
+    addEvent(ui.$bodyWrapper, 'mouseover', function (e) {
+      var tr = findParent('tr', e.target)
+      if (!tr) return
+      var trIndex = tr.getAttribute('data-index')
+      if (trIndex) {
+        that.trHover(true, Number(trIndex))
+      }
+    }),
+    addEvent(ui.$bodyWrapper, 'mouseout', function (e) {
+      var tr = findParent('tr', e.target)
+      if (!tr) return
+      var trIndex = tr.getAttribute('data-index')
+      if (trIndex) {
+        that.trHover(false, Number(trIndex))
+      }
     })
   )
 
   this.ui = ui
   this.emit('afterInit')
+}
+
+/**
+ * 处理 tr 元素的 hover 状态
+ * @param {Boolean} inOrOut - 此元素需要添加（true）还是移除（false） hover 状态
+ * @param {Number} index - 元素的 index
+ * @param {Boolean} emit - 设为 false 则不触发相关事件
+ */
+dp.trHover = function (inOrOut, index, emit) {
+  var tbody = this.ui.$bodyWrapper.querySelector('tbody')
+  var hoverToTR = tbody.querySelector('[data-index="' + index + '"]')
+  hoverToTR.classList[inOrOut ? 'add' : 'remove']('hover')
+  if (emit !== false) this.emit(inOrOut ? 'trHoverTo' : 'clearHover', index, hoverToTR, this.rows && this.rows[index])
 }
 
 /**

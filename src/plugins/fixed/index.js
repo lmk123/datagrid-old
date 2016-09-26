@@ -70,6 +70,23 @@ module.exports = function (DataGrid) {
         })
       )
 
+      unbindEvents.push(
+        datagrid.on('trHoverTo', syncHoverIn),
+        fixedDataGrid.on('trHoverTo', syncHoverIn),
+        datagrid.on('clearHover', syncHoverOut),
+        fixedDataGrid.on('clearHover', syncHoverOut)
+      )
+
+      function syncHoverIn (index, trElement) {
+        var to = fixedDataGrid.el.contains(trElement) ? datagrid : fixedDataGrid
+        to.trHover(true, index, false)
+      }
+
+      function syncHoverOut (index, trElement) {
+        var to = fixedDataGrid.el.contains(trElement) ? datagrid : fixedDataGrid
+        to.trHover(false, index, false)
+      }
+
       if (datagrid.options.selection) {
         datagrid.on('selectedChanged', function (index) {
           fixedDataGrid.selectRow(index, false)
