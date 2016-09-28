@@ -30,11 +30,14 @@ function DataGrid (ele, options) {
     height: ele.clientHeight // 表格的总高度
   }, options)
 
+  if (process.env.NODE_ENV === 'development') {
+    if (!ele.parentElement) {
+      throw new Error('Element must have a parentElement')
+    }
+  }
+
   // 从 document 里删除原本的节点并保存下来，供实例销毁之后重新显示出来
-  var parent = ele.parentElement
-  ele.parentElement.insertBefore(el, ele)
-  parent.removeChild(ele)
-  this.origin = ele
+  this.origin = ele.parentElement.replaceChild(el, ele)
 
   hooks.forEach(function (fn) { fn(this) }, this)
   this._init()
@@ -323,8 +326,7 @@ dp.setBody = function (rows) {
   var renderData = this.renderData
   this.empty = !rows || !rows.length
   renderData.rows = rows
-  renderData.trsArr = this._bodyHTML(renderData.columnsDef, rows)
-  this._renderBody(renderData.trsArr)
+  this._renderBody(renderData.trsArr = this._bodyHTML(renderData.columnsDef, rows))
 }
 
 /**
@@ -371,9 +373,9 @@ dp.destroy = function () {
 
   // 还原原本的 dom 节点
   var el = this.el
-  var parent = el.parentElement
-  parent.insertBefore(this.origin, el)
-  parent.removeChild(el)
+  try {
+    el.parentElement.replaceChild(this.origin, el)
+  } catch (e) {}
 
   this.emit('afterDestroy')
 }

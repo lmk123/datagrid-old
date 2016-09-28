@@ -14,7 +14,7 @@ var grid = new DataGrid(document.querySelector('div'), {
 window.$grid = grid
 
 grid.on('beforeRenderBody', function (arr) {
-  arr.push('<tr><td>添加自定义的 HTML 片段</td></tr>')
+  arr.push('<tr><td colspan="'+ grid.renderData.columnsDef.length +'">添加自定义的 HTML 片段</td></tr>')
 })
 
 // 测试 tr 点击事件
