@@ -24,6 +24,12 @@ module.exports = function (DataGrid) {
       })
     })
 
+    datagrid.once('beforeDestroy', function () {
+      unbindEvents.forEach(function (unbind) {
+        unbind()
+      })
+    })
+
     function initFixedDataGrid () {
       var datagridContainer = document.createElement('div')
       datagridContainer.classList.add('fixed-datagrid')

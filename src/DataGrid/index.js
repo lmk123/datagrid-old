@@ -25,10 +25,17 @@ var hooks = []
  */
 function DataGrid (ele, options) {
   Event.call(this)
-  this.el = ele
+  var el = this.el = document.createElement('div')
   this.options = extend({}, {
     height: ele.clientHeight // 表格的总高度
   }, options)
+
+  // 从 document 里删除原本的节点并保存下来，供实例销毁之后重新显示出来
+  var parent = ele.parentElement
+  ele.parentElement.insertBefore(el, ele)
+  parent.removeChild(ele)
+  this.origin = ele
+
   hooks.forEach(function (fn) { fn(this) }, this)
   this._init()
 }
@@ -356,13 +363,18 @@ dp._renderBody = function (trsArr) {
 }
 
 /**
- * 销毁实例。
- * @param {Boolean} remove - 如果为 true, 则会移除根节点
+ * 销毁实例
  */
-dp.destroy = function (remove) {
+dp.destroy = function () {
   this.emit('beforeDestroy')
   this._unbindEvents.forEach(function (unbind) { unbind() })
-  if (remove) this.el.remove()
+
+  // 还原原本的 dom 节点
+  var el = this.el
+  var parent = el.parentElement
+  parent.insertBefore(this.origin, el)
+  parent.removeChild(el)
+
   this.emit('afterDestroy')
 }
 

@@ -6,6 +6,8 @@ module.exports = function (DataGrid) {
   DataGrid.hook(function (datagrid) {
     if (!datagrid.options.pagination) return
 
+    var pagingTemplate = datagrid.options.pagingTemplate || pagerTemplate
+
     function jumpTo (pageNo) {
       if (Number.isNaN(pageNo) || pageNo < 1 || pageNo > pager.totalPage) {
         wrapper.querySelector('[data-page]').value = pager.cur
@@ -76,7 +78,7 @@ module.exports = function (DataGrid) {
         pager.total = total
         pager.totalPage = Math.ceil(total / size)
 
-        wrapper.innerHTML = pagerTemplate.replace(/\{\{(\w+)\}\}/g, function (word, group) {
+        wrapper.innerHTML = pagingTemplate.replace(/\{\{(\w+)\}\}/g, function (word, group) {
           return pager[group]
         })
         wrapper.classList.remove('hidden')
