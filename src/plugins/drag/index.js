@@ -89,9 +89,9 @@ module.exports = function (DataGrid) {
         draggingLever.classList.remove('dragging')
         var moved = e.pageX - startX // 计算移动的距离
         if (moved < minLeft) moved = minLeft
-        var columnsWidth = datagrid.renderData.columnsWidth
-        columnsWidth[draggingColumnIndex] = columnsWidth[draggingColumnIndex] + moved
-        datagrid.setWidth(columnsWidth)
+        var columnsMinWidth = datagrid.renderData.columnsMinWidth
+        columnsMinWidth[draggingColumnIndex] = columnsMinWidth[draggingColumnIndex] + moved
+        datagrid.setWidth(columnsMinWidth)
       })
     )
 
