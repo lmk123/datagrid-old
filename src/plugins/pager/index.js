@@ -66,8 +66,8 @@ module.exports = function (DataGrid) {
           wrapper.classList.add('hidden')
           return
         }
-        var size = data.size
-        var total = data.total
+        var size = data.size || 0
+        var total = data.total || 0
         var cur = pager.cur
         var dataLength = data.rows.length
         pager.total = total
@@ -76,7 +76,7 @@ module.exports = function (DataGrid) {
         pager.start = (cur - 1) * size + 1
         pager.end = pager.start + dataLength - 1
         pager.total = total
-        pager.totalPage = Math.ceil(total / size)
+        pager.totalPage = Math.ceil(total / size) || 0
 
         wrapper.innerHTML = pagingTemplate.replace(/\{\{(\w+)\}\}/g, function (word, group) {
           return pager[group]

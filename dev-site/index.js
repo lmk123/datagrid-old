@@ -819,10 +819,10 @@ window.$change = function () {
 }
 
 // 测试很短的字段
-// grid.setData({
-//   columns: ['a', 'b'],
-//   rows: [{
-//     a: 'x',
-//     b: 'y'
-//   }]
-// })
+grid.setData({
+  columns: ['a', 'b'],
+  rows: [{
+    a: 'x',
+    b: 'y'
+  }]
+})
