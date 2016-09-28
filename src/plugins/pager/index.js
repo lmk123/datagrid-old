@@ -84,13 +84,13 @@ module.exports = function (DataGrid) {
         wrapper.classList.remove('hidden')
       }),
       datagrid.on('beforeSetSize', function (heightObj) {
-        var wrapperHeight = wrapper.clientHeight
+        var wrapperHeight = wrapper.offsetHeight
         heightObj.pagerHeight = wrapperHeight
         heightObj.bodyHeight = heightObj.bodyHeight - wrapperHeight
       })
     )
     datagrid.once('afterInit', function () {
-      datagrid.el.appendChild(wrapper)
+      datagrid.ui.$gridWrapper.appendChild(wrapper)
       datagrid.ui.$pagerWrapper = wrapper
     })
     datagrid.once('beforeDestroy', function () {

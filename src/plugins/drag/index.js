@@ -59,7 +59,7 @@ module.exports = function (DataGrid) {
           var $bodyWrapper = ui.$bodyWrapper
 
           // 显示虚线
-          dragLine.style.height = $columnsWrapper.clientHeight + $bodyWrapper.clientHeight + 'px'
+          dragLine.style.height = $columnsWrapper.offsetHeight + $bodyWrapper.offsetHeight + 'px'
           draggingLineInitLeft = th.offsetLeft + th.clientWidth - $bodyWrapper.scrollLeft
           dragLine.style.left = draggingLineInitLeft + 'px'
           dragLine.classList.add('show')

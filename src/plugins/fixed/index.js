@@ -40,7 +40,7 @@ module.exports = function (DataGrid) {
 
       datagrid.el.appendChild(datagridContainer)
       fixedDataGrid = new DataGrid(div, {
-        height: datagrid.ui.$columnsWrapper.clientHeight + datagrid.ui.$bodyWrapper.clientHeight,
+        height: datagrid.ui.$columnsWrapper.offsetHeight + datagrid.ui.$bodyWrapper.offsetHeight,
         columnSorting: datagrid.options.columnSorting,
         columnResize: datagrid.options.columnResize,
         selection: datagrid.options.selection

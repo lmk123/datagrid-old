@@ -27,7 +27,7 @@ function DataGrid (ele, options) {
   Event.call(this)
   var el = this.el = document.createElement('div')
   this.options = extend({}, {
-    height: ele.clientHeight // 表格的总高度
+    height: ele.offsetHeight // 表格的总高度
   }, options)
 
   if (process.env.NODE_ENV === 'development') {
@@ -82,6 +82,7 @@ dp._init = function () {
   el.innerHTML = containerTemplate
 
   var ui = {
+    $gridWrapper: '.grid-wrapper',
     $columnsWrapper: '.grid-columns-wrapper',
     $columns: '.grid-columns',
     $columnsColGroup: '.grid-columns colgroup',
@@ -96,6 +97,8 @@ dp._init = function () {
   for (var key in ui) {
     ui[key] = el.querySelector(ui[key])
   }
+
+  ui.$gridWrapper.style.height = this.options.height + 'px'
 
   var that = this
   _unbindEvents.push(
@@ -249,24 +252,15 @@ dp._renderCols = function (colsHTML) {
 dp._resize = function (columnsWidth) {
   var ui = this.ui
   var $columns = ui.$columns
-  var $bodyWrapper = ui.$bodyWrapper
   var $noData = ui.$noData
   var $body = ui.$body
-  var _totalWidth = columnsWidth ? columnsWidth.reduce(function (prev, width) { return prev + width }) : this.el.clientWidth
-  $columns.style.width = _totalWidth + 'px' // 总长度需要先设定, 因为它会影响 columnsWrapper.clientHeight
-  var totalHeight = this.options.height
-  var columnsHeight = this.ui.$columnsWrapper.clientHeight
-  var bodyHeight = totalHeight - columnsHeight
-  var obj = {
-    totalHeight: totalHeight,
-    bodyHeight: bodyHeight
-  }
-  this.emit('beforeSetSize', obj)
-  $bodyWrapper.style.height = obj.bodyHeight + 'px'
+  var _totalWidth = columnsWidth.reduce(function (prev, width) { return prev + width })
+  $columns.style.width = _totalWidth + 'px' // 总长度需要先设定, 因为它会影响 columnsWrapper.offsetHeight
+  $body.style.width = _totalWidth + 'px'
   if (this.empty) {
-    $noData.style.height = obj.bodyHeight + 'px'
-    $noData.style.lineHeight = obj.bodyHeight + 'px'
+    $noData.classList.remove('hidden')
   } else {
+    $noData.classList.add('hidden')
     $body.style.width = _totalWidth + 'px'
   }
 }
