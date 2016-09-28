@@ -49,12 +49,10 @@ module.exports = function (DataGrid) {
           case 'next':
             pageTo = pager.cur + 1
             break
+          default:
+            return
         }
         jumpTo(pageTo)
-      }),
-      addEvent(wrapper, 'click', function (e) {
-        if (e.target.dataset.downlond === undefined) return
-        datagrid.emit('download-table')
       }),
       addEvent(wrapper, 'keydown', function (e) {
         if (e.keyCode !== 13) return
@@ -79,7 +77,7 @@ module.exports = function (DataGrid) {
         pager.totalPage = Math.ceil(total / size) || 0
 
         wrapper.innerHTML = pagingTemplate.replace(/\{\{(\w+)\}\}/g, function (word, group) {
-          return pager[group]
+          return pager.hasOwnProperty(group) ? pager[group] : word
         })
         wrapper.classList.remove('hidden')
       }),
