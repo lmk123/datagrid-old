@@ -4,6 +4,9 @@ var Event = require('../utils/Event')
 var addEvent = require('../utils/addEvent')
 var extend = require('../utils/extend')
 var findParent = require('../utils/findParent')
+var debounce = require('../utils/debounce')
+
+var DefaultWidth = 100
 
 function defaultColumnRender (columnDef) {
   return columnDef.name
@@ -109,6 +112,15 @@ dp._init = function () {
   )
 
   this.ui = ui
+
+  if (this.options.fit) {
+    _unbindEvents.push(
+      addEvent(window, 'resize', debounce(function () {
+        that.setWidth()
+      }))
+    )
+  }
+
   this.emit('afterInit')
 }
 
@@ -141,15 +153,62 @@ dp.setData = function (data) {
   this.emit('afterSetData', data)
 }
 
-dp.setWidth = function (widthArr) {
-  if (widthArr) {
-    this.renderData.columnsWidth = widthArr
-  } else {
-    widthArr = this.renderData.columnsWidth
+/**
+ * 根据用户给的宽度数组计算出实际需要用到的最小宽度数组，
+ * 因为用户可能不传宽度数组，或者宽度数组的长度比字段数组长或短，
+ * 所以要处理一遍
+ * @param {Array} [widthArr]
+ * @return {Array}
+ */
+dp.normalizeWidth = function (widthArr) {
+  var renderData = this.renderData
+  var columnsDef = renderData.columnsDef
+  if (!Array.isArray(widthArr)) widthArr = []
+  var result = []
+  for (var i = 0; i < columnsDef.length; i++) {
+    result[i] = widthArr[i] || Math.max(columnsDef[i].name.length * 15, DefaultWidth)
   }
-  var cols = this._colGroupsHTML(widthArr)
+  return result
+}
+
+/**
+ * 设置宽度。
+ * 默认情况下，用户设置的宽度会成为最终字段的宽度，
+ * 但如果 fit 设置为 true，则将用户传进来的宽度视为"最小宽度"，
+ * 如果这些最小宽度加起来大于 wrapper 的宽度，则直接使用最小宽度作为 td 的宽度；
+ * 如果加起来小于 wrapper 的宽度，则用 wrapper 宽度减去最小宽度的差值，除以字段的个数得到平均值，再给每个最小宽度加上这个平均值作为字段的真正宽度
+ * @param {Number[]} [customWidth]
+ */
+dp.setWidth = function (customWidth) {
+  var renderData = this.renderData
+
+  if (customWidth || !renderData.columnsMinWidth) {
+    renderData.columnsMinWidth = this.normalizeWidth(customWidth)
+  }
+
+  var columnsMinWidth = renderData.columnsMinWidth
+  var columnsWidth
+
+  if (this.options.fit) {
+    var sum = columnsMinWidth.reduce(function (w1, w2) {
+      return w1 + w2
+    })
+    var bodyWrapperWidth = this.ui.$bodyWrapper.clientWidth
+    if (sum >= bodyWrapperWidth) {
+      columnsWidth = columnsMinWidth
+    } else {
+      var diff = (bodyWrapperWidth - sum) / renderData.columnsDef.length
+      columnsWidth = columnsMinWidth.map(function (w) {
+        return w + diff
+      })
+    }
+  } else {
+    columnsWidth = columnsMinWidth
+  }
+  renderData.columnsWidth = columnsWidth
+  var cols = this._colGroupsHTML(columnsWidth)
   this._renderCols(cols)
-  this._resize(widthArr)
+  this._resize(columnsWidth)
 }
 
 /**
