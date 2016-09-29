@@ -8,11 +8,11 @@ var debounce = require('../utils/debounce')
 
 var DefaultWidth = 100
 
-function defaultColumnRender (columnDef) {
+function defaultThRenderer (columnDef) {
   return columnDef.name
 }
 
-function defaultDataRender (columnDef, rowData) {
+function defaultTdRenderer (columnDef, rowData) {
   return rowData[columnDef.key]
 }
 
@@ -296,8 +296,21 @@ dp._normalize = function (columns) {
  * @private
  */
 dp._columnsHTML = function (columnsDef) {
+  var customRenderer = this.options.thRenderer
   return columnsDef.map(function (columnDef) {
-    return '<th>' + (columnDef.th || defaultColumnRender)(columnDef) + '</th>'
+    let content
+    if (customRenderer) {
+      content = customRenderer(columnDef)
+    }
+    if (content == null) {
+      if (columnDef.thRenderer) {
+        content = columnDef.thRenderer(columnDef)
+      }
+    }
+    if (content == null) {
+      content = defaultThRenderer(columnDef)
+    }
+    return '<th>' + content + '</th>'
   })
 }
 
@@ -326,10 +339,23 @@ dp.setBody = function (rows) {
  * @private
  */
 dp._bodyHTML = function (columnsDef, rows) {
+  var customRenderer = this.options.tdRenderer
   return this.empty ? [] : rows.map(function (row, index) {
     var rowHTML = '<tr data-index="' + index + '">'
     columnsDef.forEach(function (columnDef) {
-      rowHTML += '<td>' + (columnDef.td || defaultDataRender)(columnDef, row) + '</td>'
+      let content
+      if (customRenderer) {
+        content = customRenderer(columnDef, row)
+      }
+      if (content == null) {
+        if (columnDef.tdRenderer) {
+          content = columnDef.tdRenderer(columnDef, row)
+        }
+      }
+      if (content == null) {
+        content = defaultTdRenderer(columnDef, row)
+      }
+      rowHTML += '<td>' + content + '</td>'
     })
     rowHTML += '</tr>'
     return rowHTML
