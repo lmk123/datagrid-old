@@ -80,11 +80,6 @@ module.exports = function (DataGrid) {
           return pager.hasOwnProperty(group) ? pager[group] : word
         })
         wrapper.classList.remove('hidden')
-      }),
-      datagrid.on('beforeSetSize', function (heightObj) {
-        var wrapperHeight = wrapper.offsetHeight
-        heightObj.pagerHeight = wrapperHeight
-        heightObj.bodyHeight = heightObj.bodyHeight - wrapperHeight
       })
     )
     datagrid.once('afterInit', function () {

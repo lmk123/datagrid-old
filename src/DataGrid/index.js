@@ -255,13 +255,11 @@ dp._resize = function (columnsWidth) {
   var $noData = ui.$noData
   var $body = ui.$body
   var _totalWidth = columnsWidth.reduce(function (prev, width) { return prev + width })
-  $columns.style.width = _totalWidth + 'px' // 总长度需要先设定, 因为它会影响 columnsWrapper.offsetHeight
-  $body.style.width = _totalWidth + 'px'
+  $columns.style.width = $body.style.width = _totalWidth + 'px'
   if (this.empty) {
     $noData.classList.remove('hidden')
   } else {
     $noData.classList.add('hidden')
-    $body.style.width = _totalWidth + 'px'
   }
 }
 
