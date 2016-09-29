@@ -1,9 +1,6 @@
-var DataGrid = require('./DataGrid/index')
-
-DataGrid.use(require('./plugins/selection'))
-DataGrid.use(require('./plugins/pager'))
-DataGrid.use(require('./plugins/sort'))
-DataGrid.use(require('./plugins/drag'))
-DataGrid.use(require('./plugins/fixed'))
-
-module.exports = DataGrid
+module.exports = require('./DataGrid/index')
+module.exports.Selection = require('./plugins/selection')
+module.exports.Paging = require('./plugins/pager')
+module.exports.Sorting = require('./plugins/sort')
+module.exports.ColumnMove = require('./plugins/drag')
+module.exports.ColumnFixed = require('./plugins/fixed')

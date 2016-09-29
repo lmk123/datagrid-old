@@ -1,5 +1,11 @@
 var DataGrid = require('../src/index')
 
+DataGrid.use(DataGrid.Sorting)
+DataGrid.use(DataGrid.ColumnFixed)
+DataGrid.use(DataGrid.ColumnMove)
+DataGrid.use(DataGrid.Paging)
+DataGrid.use(DataGrid.Selection)
+
 window.DataGrid = DataGrid
 
 var grid = new DataGrid(document.querySelector('div'), {
