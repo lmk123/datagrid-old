@@ -15,6 +15,8 @@
     "url": "git+https://github.com/lmk123/datagrid.git"
   },
   "scripts": {
+    "prepub": "npm run build && mv .npmrc x.npmrc",
+    "postpub": "mv x.npmrc .npmrc",
     "start": "webpack-dev-server --inline --config build/webpack.dev.server.config.js",
     "build": "webpack --config build/webpack.dev.config.js && webpack --config build/webpack.build.config.js",
     "lint": "eslint --ignore-pattern '/dist/' \"**/*.{js,vue}\""
