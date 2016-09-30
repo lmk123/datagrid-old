@@ -80,10 +80,10 @@ grid.setData({
       name: '对比',
       _a: 'x',
       sortable: false,
-      th: function () {
+      thRenderer: function () {
         return '<input type="checkbox">对比'
       },
-      td: function (columnDef, row, index) {
+      tdRenderer: function (columnDef, row, index) {
         return '<input type="checkbox">'
       }
     },
@@ -830,10 +830,10 @@ window.$change = function () {
 }
 
 // 测试很短的字段
-grid.setData({
-  columns: ['a', 'b'],
-  rows: [{
-    a: 'x',
-    b: 'y'
-  }]
-})
+// grid.setData({
+//   columns: ['a', 'b'],
+//   rows: [{
+//     a: 'x',
+//     b: 'y'
+//   }]
+// })

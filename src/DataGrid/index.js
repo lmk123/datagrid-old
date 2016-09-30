@@ -157,8 +157,8 @@ dp._init = function () {
  * @param {Boolean} emit - 设为 false 则不触发相关事件
  */
 dp.trHover = function (inOrOut, index, emit) {
-  var tbody = this.ui.$bodyWrapper.querySelector('tbody')
-  var hoverToTR = tbody.querySelector('[data-index="' + index + '"]')
+  var tbody = this.ui.$bodyTbody
+  var hoverToTR = tbody.querySelector('tr[data-index="' + index + '"]')
   hoverToTR.classList[inOrOut ? 'add' : 'remove']('hover')
   if (emit !== false) this.emit(inOrOut ? 'trHoverTo' : 'clearHover', index, hoverToTR, this.rows && this.rows[index])
 }
