@@ -306,9 +306,10 @@ dp._columnsHTML = function (columnsDef) {
       if (columnDef.thRenderer) {
         content = columnDef.thRenderer(columnDef)
       }
-    }
-    if (content == null) {
-      content = defaultThRenderer(columnDef)
+
+      if (content == null) {
+        content = defaultThRenderer(columnDef)
+      }
     }
     return '<th>' + content + '</th>'
   })
@@ -351,9 +352,9 @@ dp._bodyHTML = function (columnsDef, rows) {
         if (columnDef.tdRenderer) {
           content = columnDef.tdRenderer(columnDef, row)
         }
-      }
-      if (content == null) {
-        content = defaultTdRenderer(columnDef, row)
+        if (content == null) {
+          content = defaultTdRenderer(columnDef, row)
+        }
       }
       rowHTML += '<td>' + content + '</td>'
     })
