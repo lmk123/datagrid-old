@@ -311,7 +311,7 @@ dp._normalize = function (columns) {
 dp._columnsHTML = function (columnsDef) {
   var customRenderer = this.options.thRenderer
   return columnsDef.map(function (columnDef, index) {
-    let content
+    var content
     if (customRenderer) {
       content = customRenderer(columnDef)
     }
@@ -357,7 +357,7 @@ dp._bodyHTML = function (columnsDef, rows) {
   return this.empty ? [] : rows.map(function (row, rowIndex) {
     var rowHTML = '<tr data-index="' + rowIndex + '">'
     columnsDef.forEach(function (columnDef, columnIndex) {
-      let content
+      var content
       if (customRenderer) {
         content = customRenderer(columnDef, row)
       }
