@@ -106,6 +106,8 @@ dp._init = function () {
     addEvent(ui.$bodyWrapper, 'scroll', function () {
       ui.$columns.style.left = '-' + ui.$bodyWrapper.scrollLeft + 'px'
     }),
+    // 鼠标移入或移出的时候，给 tr 加上 hover 状态。
+    // 之所以不用 css 实现，是因为 fixedGrid 需要能用 js 设置 tr 的 hover 状态
     addEvent(ui.$bodyWrapper, 'mouseover', function (e) {
       var tr = findParent('tr', e.target)
       if (!tr) return
@@ -121,6 +123,17 @@ dp._init = function () {
       if (trIndex) {
         that.trHover(false, Number(trIndex))
       }
+    }),
+    // 点击 cell 的时候给出一个事件
+    addEvent(ui.$bodyWrapper, 'click', function (e) {
+      var td = findParent('td', e.target)
+      if (!td) return
+      var tr = findParent('tr', td)
+      if (!tr) return
+      var tdIndex = td.getAttribute('data-index')
+      var trIndex = tr.getAttribute('data-index')
+      var renderData = that.renderData
+      that.emit('cellClick', renderData.columnsDef[tdIndex], that.empty ? null : renderData.rows[trIndex])
     })
   )
 
@@ -297,7 +310,7 @@ dp._normalize = function (columns) {
  */
 dp._columnsHTML = function (columnsDef) {
   var customRenderer = this.options.thRenderer
-  return columnsDef.map(function (columnDef) {
+  return columnsDef.map(function (columnDef, index) {
     let content
     if (customRenderer) {
       content = customRenderer(columnDef)
@@ -311,7 +324,7 @@ dp._columnsHTML = function (columnsDef) {
         content = defaultThRenderer(columnDef)
       }
     }
-    return '<th>' + content + '</th>'
+    return '<th data-index="' + index + '">' + content + '</th>'
   })
 }
 
@@ -341,9 +354,9 @@ dp.setBody = function (rows) {
  */
 dp._bodyHTML = function (columnsDef, rows) {
   var customRenderer = this.options.tdRenderer
-  return this.empty ? [] : rows.map(function (row, index) {
-    var rowHTML = '<tr data-index="' + index + '">'
-    columnsDef.forEach(function (columnDef) {
+  return this.empty ? [] : rows.map(function (row, rowIndex) {
+    var rowHTML = '<tr data-index="' + rowIndex + '">'
+    columnsDef.forEach(function (columnDef, columnIndex) {
       let content
       if (customRenderer) {
         content = customRenderer(columnDef, row)
@@ -356,7 +369,7 @@ dp._bodyHTML = function (columnsDef, rows) {
           content = defaultTdRenderer(columnDef, row)
         }
       }
-      rowHTML += '<td>' + content + '</td>'
+      rowHTML += '<td data-index="' + columnIndex + '">' + content + '</td>'
     })
     rowHTML += '</tr>'
     return rowHTML
