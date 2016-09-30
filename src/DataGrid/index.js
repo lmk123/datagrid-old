@@ -192,7 +192,7 @@ dp.normalizeWidth = function (widthArr) {
   if (!Array.isArray(widthArr)) widthArr = []
   var result = []
   for (var i = 0; i < columnsDef.length; i++) {
-    result[i] = widthArr[i] || Math.max(columnsDef[i].name.length * 15, DefaultWidth)
+    result[i] = widthArr[i] || Math.max((columnsDef[i].name || '').length * 15, DefaultWidth)
   }
   return result
 }

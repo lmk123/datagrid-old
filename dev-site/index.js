@@ -12,8 +12,8 @@ var grid = new DataGrid(document.querySelector('div'), {
   columnSorting: true,
   columnResize: true,
   pagination: true,
-  selection: true,
-  fixedColumns: true,
+  selection: 'multiple',
+  // fixedColumns: true,
   fit: true
 })
 
@@ -76,17 +76,6 @@ grid.setData({
 // 测试设置数据
 grid.setData({
   columns: [
-    {
-      name: '对比',
-      _a: 'x',
-      sortable: false,
-      thRenderer: function () {
-        return '<input type="checkbox">对比'
-      },
-      tdRenderer: function (columnDef, row, index) {
-        return '<input type="checkbox">'
-      }
-    },
     '日期',
     '总计',
     '催单(用户)',
