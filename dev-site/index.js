@@ -12,8 +12,8 @@ var grid = new DataGrid(document.querySelector('div'), {
   columnSorting: true,
   columnResize: true,
   pagination: true,
-  selection: 'multiple',
-  // fixedColumns: true,
+  // selection: 'multiple',
+  fixedColumns: true,
   fit: true
 })
 

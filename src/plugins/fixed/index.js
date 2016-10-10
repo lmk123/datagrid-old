@@ -1,4 +1,5 @@
 require('./index.scss')
+var slice = Array.prototype.slice
 var addEvent = require('../../utils/addEvent')
 
 module.exports = function (DataGrid) {
@@ -8,9 +9,10 @@ module.exports = function (DataGrid) {
     var unbindEvents = []
 
     var fixedDataGrid
+    var fixedColumnsLeft
 
     datagrid.on('afterSetData', function (data) {
-      var fixedColumnsLeft = data.fixedColumnsLeft
+      fixedColumnsLeft = data.fixedColumnsLeft
       if (!fixedColumnsLeft) {
         if (fixedDataGrid) fixedDataGrid.el.classList.add('hidden')
         return
@@ -99,6 +101,21 @@ module.exports = function (DataGrid) {
         })
         fixedDataGrid.on('selectedChanged', function (index) {
           datagrid.selectRow(index)
+        })
+      }
+
+      if (datagrid.options.columnSorting) {
+        fixedDataGrid.on('sort', function (columnDef, direction, index) {
+          datagrid.sortBy(index)
+        })
+        datagrid.on('sort', function (columnDef, direction, index) {
+          if (index < fixedColumnsLeft) return
+          var lastSortIndex = fixedDataGrid.sort && fixedDataGrid.sort.index
+          if (typeof lastSortIndex === 'number') {
+            fixedDataGrid.sort.direction = 0
+            var lastTh = fixedDataGrid.ui.$columnsWrapper.querySelector('th[data-index="' + lastSortIndex + '"]')
+            if (lastTh) lastTh.classList.remove('order-by-asc', 'order-by-desc')
+          }
         })
       }
     }
