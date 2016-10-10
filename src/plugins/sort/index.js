@@ -71,7 +71,7 @@ module.exports = function (DataGrid) {
           }
           datagrid.emit('sort', columnDef, sortType, th)
         }),
-        datagrid.on('afterSetData', () => {
+        datagrid.on('afterSetData', function () {
           if (typeof lastSortColumnIndex !== 'number' || lastSortColumnIndex < 0) return
           var th = datagrid.ui.$columnsWrapper.querySelector('th[data-index=' + lastSortColumnIndex + ']')
           if (!th) return
