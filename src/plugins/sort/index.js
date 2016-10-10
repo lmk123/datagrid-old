@@ -76,7 +76,7 @@ module.exports = function (DataGrid) {
           datagrid.emit('sort', columnDef, sortType, th)
         }),
         // 在每次重新 render 表头之后给表头加上排序状态
-        datagrid.on('afterSetData', () => {
+        datagrid.on('afterSetData', function () {
           if (typeof lastSortColumnIndex !== 'number' || lastSortColumnIndex < 0) return
           var th = datagrid.ui.$columnsWrapper.querySelector('th[data-index="' + lastSortColumnIndex + '"]')
           if (!th) return
