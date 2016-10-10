@@ -7,6 +7,7 @@ var findParent = require('../utils/findParent')
 var debounce = require('../utils/debounce')
 
 var DefaultWidth = 100
+var CssClassNamespace = 'data-grid'
 
 function defaultThRenderer (columnDef) {
   return columnDef.name
@@ -78,7 +79,7 @@ dp._init = function () {
   var _unbindEvents = this._unbindEvents = []
   this.emit('beforeInit')
   var el = this.el
-  el.classList.add('datagrid')
+  el.classList.add(CssClassNamespace)
   el.innerHTML = containerTemplate
 
   var ui = {

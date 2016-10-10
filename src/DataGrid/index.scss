@@ -1,5 +1,5 @@
 @charset "utf-8";
-.datagrid {
+.data-grid {
   position: relative; // 方便定位
 
   .hidden {
@@ -55,10 +55,8 @@
       transform: translate(-50%, -50%);
     }
   }
-}
 
-// 下面的样式是一些可以被覆盖的
-.datagrid {
+  // 下面的样式是一些可以被覆盖的
   background-color: #fff;
   font-size: 12px;
   color: #333;
