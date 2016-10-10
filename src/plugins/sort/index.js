@@ -36,6 +36,24 @@ module.exports = function (DataGrid) {
       }
     }
 
+    function addSortCssClass (th) {
+      th.classList.remove(CLASS_ASC, CLASS_DESC)
+
+      switch (sortType) {
+        case NONE_ORDER:
+          sortType = ASC
+          th.classList.add(CLASS_ASC)
+          break
+        case ASC:
+          sortType = DESC
+          th.classList.add(CLASS_DESC)
+          break
+        case DESC:
+          sortType = NONE_ORDER
+          break
+      }
+    }
+
     datagrid.once('afterInit', function () {
       // 监听字段的点击事件
       var $columnsWrapper = datagrid.ui.$columnsWrapper
@@ -54,22 +72,15 @@ module.exports = function (DataGrid) {
             sortType = NONE_ORDER
           }
 
-          th.classList.remove(CLASS_ASC, CLASS_DESC)
-
-          switch (sortType) {
-            case NONE_ORDER:
-              sortType = ASC
-              th.classList.add(CLASS_ASC)
-              break
-            case ASC:
-              sortType = DESC
-              th.classList.add(CLASS_DESC)
-              break
-            case DESC:
-              sortType = NONE_ORDER
-              break
-          }
+          addSortCssClass(th)
           datagrid.emit('sort', columnDef, sortType, th)
+        }),
+        // 在每次重新 render 表头之后给表头加上排序状态
+        datagrid.on('afterSetData', () => {
+          if (typeof lastSortColumnIndex !== 'number' || lastSortColumnIndex < 0) return
+          var th = datagrid.ui.$columnsWrapper.querySelector('th[data-index="' + lastSortColumnIndex + '"]')
+          if (!th) return
+          addSortCssClass(th)
         })
       )
     })
