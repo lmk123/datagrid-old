@@ -73,7 +73,7 @@ module.exports = function (DataGrid) {
         }),
         datagrid.on('afterSetData', function () {
           if (typeof lastSortColumnIndex !== 'number' || lastSortColumnIndex < 0) return
-          var th = datagrid.ui.$columnsWrapper.querySelector('th[data-index=' + lastSortColumnIndex + ']')
+          var th = datagrid.ui.$columnsWrapper.querySelector('th[data-index="' + lastSortColumnIndex + '"]')
           if (!th) return
           switch (sortType) {
             case ASC:
