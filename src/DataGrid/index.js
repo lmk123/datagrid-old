@@ -203,11 +203,14 @@ dp.normalizeWidth = function (widthArr) {
  * 但如果 fit 设置为 true，则将用户传进来的宽度视为"最小宽度"，
  * 如果这些最小宽度加起来大于 wrapper 的宽度，则直接使用最小宽度作为 td 的宽度；
  * 如果加起来小于 wrapper 的宽度，则用 wrapper 宽度减去最小宽度的差值，除以字段的个数得到平均值，再给每个最小宽度加上这个平均值作为字段的真正宽度
- * @param {Number[]} [customWidth]
+ * @param {Number[]} [width]
  */
-dp.setWidth = function (customWidth) {
+dp.setWidth = function (width) {
+  var obj = { width }
+  this.emit('beforeSetWidth', obj)
   var renderData = this.renderData
 
+  var customWidth = obj.width
   if (customWidth || !renderData.columnsMinWidth) {
     renderData.columnsMinWidth = this.normalizeWidth(customWidth)
   }
