@@ -172,11 +172,18 @@ dp.trHover = function (inOrOut, index, emit) {
  * @param {Number[]} data.width - 每个字段对应的宽度
  */
 dp.setData = function (data) {
-  this.emit('beforeSetData', data)
   this.renderData = {}
-  this.setColumns(data.columns)
-  this.setBody(data.rows)
-  this.setWidth(data.width)
+  this.emit('beforeSetData', data)
+  this.empty = !(data.columns && data.columns.length) || (!(data.rows && data.rows.length))
+  if (this.empty) {
+    var ui = this.ui
+    ui.$body.classList.add('hidden')
+    ui.$noData.classList.remove('hidden')
+  } else {
+    this.setColumns(data.columns)
+    this.setBody(data.rows)
+    this.setWidth(data.width)
+  }
   this.emit('afterSetData', data)
 }
 
@@ -229,7 +236,7 @@ dp.setWidth = function (width) {
     } else {
       var diff = (bodyWrapperWidth - sum) / renderData.columnsDef.length
       columnsWidth = columnsMinWidth.map(function (w) {
-        return w + diff
+        return Math.round(w + diff)
       })
     }
   } else {
@@ -387,17 +394,9 @@ dp._bodyHTML = function (columnsDef, rows) {
  */
 dp._renderBody = function (trsArr) {
   var ui = this.ui
-  var $body = ui.$body
-  var $noData = ui.$noData
-  var $bodyTbody = ui.$bodyTbody
-  if (this.empty) {
-    $body.classList.add('hidden')
-    $noData.classList.remove('hidden')
-    return
-  }
-  $bodyTbody.innerHTML = trsArr.join('')
-  $body.classList.remove('hidden')
-  $noData.classList.add('hidden')
+  ui.$bodyTbody.innerHTML = trsArr.join('')
+  ui.$body.classList.remove('hidden')
+  ui.$noData.classList.add('hidden')
 }
 
 /**
