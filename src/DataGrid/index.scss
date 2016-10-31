@@ -9,6 +9,7 @@
   table {
     border-collapse: collapse;
     border-spacing: 0;
+    table-layout: fixed;
   }
 
   th, td {
@@ -17,6 +18,11 @@
 
   th {
     position: relative; // 方便定位
+  }
+
+  td {
+    word-wrap: break-word;
+    word-break: break-all;
   }
 
   .grid-wrapper {
