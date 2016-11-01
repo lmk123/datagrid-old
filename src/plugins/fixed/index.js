@@ -24,6 +24,15 @@ module.exports = function (DataGrid) {
         width: datagrid.renderData.columnsWidth.slice(0, fixedColumnsLeft),
         rows: datagrid.renderData.rows
       })
+      // 保证 fixedDataGrid 中每一行的高度都与原 datagrid 的高度一致
+      var fixedGridTrs = slice.call(fixedDataGrid.ui.$columnsWrapper.querySelectorAll('tr')).concat(slice.call(fixedDataGrid.ui.$bodyWrapper.querySelectorAll('tr')))
+      var gridTrs = slice.call(datagrid.ui.$columnsWrapper.querySelectorAll('tr')).concat(slice.call(datagrid.ui.$bodyWrapper.querySelectorAll('tr')))
+      fixedGridTrs.forEach(function (tr, index) {
+        var dTr = gridTrs[index]
+        if (tr.clientHeight !== dTr.clientHeight) {
+          tr.style.height = dTr.clientHeight + 'px'
+        }
+      })
     })
 
     datagrid.once('beforeDestroy', function () {

@@ -85,7 +85,7 @@ grid.setData({
       '订单变更(用户)': '2,444',
       '钱款问题(用户)': '24,016',
       '订单投诉(用户)': '51,501',
-      '软件、账户、会员卡(用户)': 'longlonglonglonglonglonglonglonglonglonglonglonglong',
+      '软件、账户、会员卡(用户)': 'longlonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglong',
       '账户与资金(商家)': '23,791',
       '手淘及支付宝店铺(商家)': '7,062',
       '物流配送(商家)': '11,338',
@@ -415,7 +415,7 @@ grid.setData({
     }
   ],
   // width: [100, 100, 100, 100, 100, 130, 130, 130, 220, 140, 200, 130, 160, 160, 200, 200, 100, 100, 100, 100],
-  // fixedColumnsLeft: 3,
+  fixedColumnsLeft: 3,
   size: 30,
   total: 109
 })
