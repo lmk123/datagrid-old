@@ -323,14 +323,13 @@ dp._columnsHTML = function (columnsDef) {
   var customRenderer = this.options.thRenderer
   return columnsDef.map(function (columnDef, index) {
     var content
-    if (customRenderer) {
-      content = customRenderer(columnDef)
+    if (columnDef.thRenderer) {
+      content = columnDef.thRenderer(columnDef)
     }
     if (content == null) {
-      if (columnDef.thRenderer) {
-        content = columnDef.thRenderer(columnDef)
+      if (customRenderer) {
+        content = customRenderer(columnDef)
       }
-
       if (content == null) {
         content = defaultThRenderer(columnDef)
       }
@@ -369,12 +368,12 @@ dp._bodyHTML = function (columnsDef, rows) {
     var rowHTML = '<tr data-index="' + rowIndex + '">'
     columnsDef.forEach(function (columnDef, columnIndex) {
       var content
-      if (customRenderer) {
-        content = customRenderer(columnDef, row)
+      if (columnDef.tdRenderer) {
+        content = columnDef.tdRenderer(columnDef, row)
       }
       if (content == null) {
-        if (columnDef.tdRenderer) {
-          content = columnDef.tdRenderer(columnDef, row)
+        if (customRenderer) {
+          content = customRenderer(columnDef, row)
         }
         if (content == null) {
           content = defaultTdRenderer(columnDef, row)
