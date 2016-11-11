@@ -214,6 +214,7 @@ dp.normalizeWidth = function (widthArr) {
  * @param {Number[]} [width]
  */
 dp.setWidth = function (width) {
+  if (this.empty) return
   var obj = { width: width }
   this.emit('beforeSetWidth', obj)
   var renderData = this.renderData
