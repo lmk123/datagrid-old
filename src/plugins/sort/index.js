@@ -51,9 +51,6 @@ module.exports = function (DataGrid) {
 
     var unbindEvents = []
 
-    var lastSortColumnIndex
-    var sortType = NONE_ORDER
-
     unbindEvents.push(
       // 给每个字段内部注入小箭头
       datagrid.on('beforeRenderColumns', function (columnsHTMLArr) {

@@ -18,7 +18,8 @@
     "prepublish": "npm run build",
     "start": "webpack-dev-server --inline --config build/webpack.dev.server.config.js",
     "build": "webpack --config build/webpack.dev.config.js && webpack --config build/webpack.build.config.js",
-    "lint": "eslint --ignore-pattern '/dist/' \"**/*.{js,vue}\""
+    "lint": "eslint --ignore-pattern '/dist/' \"**/*.{js,vue}\"",
+    "pub": "npm run lint && npm build && npm publish"
   },
   "dependencies": {
   },

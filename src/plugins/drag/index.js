@@ -34,7 +34,6 @@ module.exports = function (DataGrid) {
     })
 
     var dragging = false // 是否正在拖动中
-    var draggingLever // 被拖动的那个小方块
     var draggingTH // 被拖动的 th 元素
     var draggingColumnIndex // 被拖动的元素是第几个字段
     var startX // 拖动开始时的 pageX 值
@@ -89,7 +88,6 @@ module.exports = function (DataGrid) {
           minLeft = -(th.clientWidth - MIN_WIDTH)
           draggingTH = th
           dragging = true
-          draggingLever = e.target
           startX = getPageX(e)
           draggingColumnIndex = indexOf.call(th.parentElement.children, th)
         }
