@@ -1,10 +1,18 @@
 @charset "utf-8";
+
+html.data-grid-dragging {
+  cursor: col-resize;
+
+  .dragging-line {
+    display: block;
+  }
+}
+
 .data-grid {
 
   .drag-lever {
     position: absolute;
     width: 4px;
-    cursor: col-resize;
     top: 0;
     bottom: 0;
     right: 0;
@@ -17,9 +25,5 @@
     border-right: 1px dotted gray;
     top: 0;
     left: 0;
-
-    &.show {
-      display: block;
-    }
   }
 }

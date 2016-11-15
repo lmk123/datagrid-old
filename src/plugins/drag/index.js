@@ -11,6 +11,12 @@ var MOUSEDOWN = IS_TOUCH ? 'touchstart' : 'mousedown'
 var MOUSEMOVE = IS_TOUCH ? 'touchmove' : 'mousemove'
 var MOUSEUP = IS_TOUCH ? 'touchend' : 'mouseup'
 
+var getPageX = IS_TOUCH ? function (e) {
+  return e.pageX || e.changedTouches[0].pageX
+} : function (e) {
+  return e.pageX
+}
+
 module.exports = function (DataGrid) {
   DataGrid.hook(function (datagrid) {
     if (!datagrid.options.columnResize) return
@@ -35,6 +41,34 @@ module.exports = function (DataGrid) {
     var draggingLineInitLeft // 拖动开始时虚线的左编剧
     var minLeft // 当往左边拖动时能拖动的最大距离
 
+    function showDragLine (th) {
+      // 显示虚线
+      var ui = datagrid.ui
+      var $columnsWrapper = ui.$columnsWrapper
+      var $bodyWrapper = ui.$bodyWrapper
+
+      dragLine.style.height = $columnsWrapper.offsetHeight + $bodyWrapper.offsetHeight + 'px'
+      draggingLineInitLeft = th.offsetLeft + th.clientWidth - $bodyWrapper.scrollLeft
+      dragLine.style.left = draggingLineInitLeft + 1 + 'px'
+      document.documentElement.classList.add('data-grid-dragging')
+    }
+
+    // 在非触摸屏设备上，鼠标移上去的时候就显示拖拽虚线
+    if (!IS_TOUCH) {
+      unbindEvents.push(
+        addEvent(datagrid.el, 'mouseover', function (e) {
+          if (!e.target.classList.contains('drag-lever')) return
+          var th = findParent('th', e.target, datagrid.el)
+          if (!th) return
+          showDragLine(th)
+        }),
+        addEvent(datagrid.el, 'mouseout', function (e) {
+          if (!e.target.classList.contains('drag-lever') || dragging) return
+          document.documentElement.classList.remove('data-grid-dragging')
+        })
+      )
+    }
+
     unbindEvents.push(
       // 注入供用户拖拽的小方块
       datagrid.on('beforeRenderColumns', function (columnsHTMLArr) {
@@ -43,31 +77,20 @@ module.exports = function (DataGrid) {
         })
       }),
       addEvent(datagrid.el, MOUSEDOWN, function (e) {
-        if (e.target.classList.contains('drag-lever') && e.button === 0) {
+        if (e.target.classList.contains('drag-lever') && (IS_TOUCH || e.button === 0)) {
           var th = findParent('th', e.target, datagrid.el)
           if (!th) return
+
+          if (IS_TOUCH) showDragLine(th)
 
           // 给 th 加一个状态, 避免触发排序功能
           // todo 需要一个临时关闭排序的开关
           th.classList.add('resizing')
-          draggingTH = th
-
           minLeft = -(th.clientWidth - MIN_WIDTH)
-
-          var ui = datagrid.ui
-          var $columnsWrapper = ui.$columnsWrapper
-          var $bodyWrapper = ui.$bodyWrapper
-
-          // 显示虚线
-          dragLine.style.height = $columnsWrapper.offsetHeight + $bodyWrapper.offsetHeight + 'px'
-          draggingLineInitLeft = th.offsetLeft + th.clientWidth - $bodyWrapper.scrollLeft
-          dragLine.style.left = draggingLineInitLeft + 'px'
-          dragLine.classList.add('show')
-
+          draggingTH = th
           dragging = true
           draggingLever = e.target
-          draggingLever.classList.add('dragging')
-          startX = e.pageX
+          startX = getPageX(e)
           draggingColumnIndex = indexOf.call(th.parentElement.children, th)
         }
       }),
@@ -75,19 +98,18 @@ module.exports = function (DataGrid) {
         if (!dragging) return
         e.preventDefault() // 阻止在 PC 端拖动鼠标时选中文字或在移动端滑动屏幕
         // 调整虚线的 left 值
-        var moved = e.pageX - startX
+        var moved = getPageX(e) - startX
         if (moved > minLeft) {
-          dragLine.style.left = draggingLineInitLeft + (e.pageX - startX) + 'px'
+          dragLine.style.left = draggingLineInitLeft + (getPageX(e) - startX) + 'px'
         }
       }),
       addEvent(document, MOUSEUP, function (e) {
         if (!dragging) return
         // 等 ../sort/index.js 里的 click 事件处理完后再移除这个 CSS 类
         setTimeout(function () { draggingTH.classList.remove('resizing') }, 0)
-        dragLine.classList.remove('show')
+        document.documentElement.classList.remove('data-grid-dragging')
         dragging = false
-        draggingLever.classList.remove('dragging')
-        var moved = e.pageX - startX // 计算移动的距离
+        var moved = getPageX(e) - startX // 计算移动的距离
         if (moved < minLeft) moved = minLeft
         var columnsMinWidth = datagrid.renderData.columnsMinWidth
         columnsMinWidth[draggingColumnIndex] = columnsMinWidth[draggingColumnIndex] + moved
