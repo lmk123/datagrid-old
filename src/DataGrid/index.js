@@ -135,6 +135,17 @@ dp._init = function () {
       var trIndex = tr.getAttribute('data-index')
       var renderData = that.renderData
       that.emit('cellClick', renderData.columnsDef[tdIndex], that.empty ? null : renderData.rows[trIndex])
+    }),
+    // 双击 cell 的时候给出一个事件
+    addEvent(ui.$bodyWrapper, 'dblclick', function (e) {
+      var td = findParent('td', e.target)
+      if (!td) return
+      var tr = findParent('tr', td)
+      if (!tr) return
+      var tdIndex = td.getAttribute('data-index')
+      var trIndex = tr.getAttribute('data-index')
+      var renderData = that.renderData
+      that.emit('cellDoubleClick', renderData.columnsDef[tdIndex], that.empty ? null : renderData.rows[trIndex])
     })
   )
 
