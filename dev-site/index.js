@@ -24,6 +24,11 @@ grid.on('cellClick', function (columnDef, rowData) {
   console.log('被点击单元格所在的行的数据', rowData)
 })
 
+grid.on('cellDoubleClick', function (columnDef, rowData) {
+  console.log('双击了一个单元格', columnDef)
+  console.log('被点击单元格所在的行的数据', rowData)
+})
+
 grid.on('beforeRenderBody', function (arr) {
   arr.push('<tr><td colspan="' + grid.renderData.columnsDef.length + '">添加自定义的 HTML 片段</td></tr>')
 })
